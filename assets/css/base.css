@@ -10,6 +10,9 @@ button, input, textarea, select { font: inherit; }
 main.container { padding-block: clamp(40px, 6vw, 96px) var(--space-section); }
 h1, h2, h3 { font-family: var(--font-heading); line-height: 1.1; margin: 0 0 var(--space-3); text-wrap: balance; }
 h1 { font-size: var(--text-h1); }
+/* 404 и юридические: заголовок — широким шрифтом заглавными, как на главной (проверка 2026-10-07) */
+main.container h1 { font-stretch: var(--font-stretch-display, 100%); font-weight: 800; text-transform: uppercase; font-size: clamp(24px, 3.6vw, 56px); line-height: .98; letter-spacing: -.02em; max-width: 24ch; }
+@media (max-width: 600px) { main.container h1 { font-stretch: 125%; font-size: clamp(20px, 6vw, 28px); } }
 h2 { font-size: var(--text-h2); }
 p, li { max-width: 65ch; }
 a { color: var(--color-accent); text-underline-offset: 3px; }
@@ -68,6 +71,12 @@ a { color: var(--color-accent); text-underline-offset: 3px; }
   .site-header { gap: 8px; }
   .site-header__name { font-stretch: 150%; font-size: clamp(11px, 3.2vw, 14px); }
   .site-header__toggle { width: 40px; height: 40px; }
+}
+/* самый узкий телефон (320px; проверка 2026-10-07: кнопка шапки выходила за край — горизонтальная прокрутка) */
+@media (max-width: 359px) {
+  .site-header { gap: 6px; }
+  .site-header__name { font-stretch: 125%; font-size: 11px; }
+  .site-header .button--small { padding: 8px 10px; font-size: 14px; }
 }
 @keyframes nav-in { from { transform: translateY(-10px); } }   /* только сдвиг: если анимация не стартует, меню всё равно видно */
 @media (max-width: 1023px) and (prefers-reduced-motion: reduce) { .site-header.is-open .site-header__nav { animation: none; } .site-header__toggle i { transition: none; } }

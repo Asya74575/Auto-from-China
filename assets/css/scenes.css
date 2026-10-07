@@ -55,7 +55,11 @@ section.theme-paper { --color-bg: #ece8df; --color-surface: #f7f5f0; --color-tex
 .map__head { fill: var(--color-accent); stroke: var(--color-bg); stroke-width: 3; }
 .map__stops { position: relative; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--space-3); row-gap: clamp(80px, 9vw, 150px); margin: 0; padding: 0; list-style: none; }
 .map__stop { grid-column: var(--col); }
-.map__node { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin: 0 0 16px; font-size: var(--text-small); }
+.map__node { position: relative; display: flex; align-items: flex-start; gap: 12px; margin: 0 0 16px; font-size: var(--text-small); }
+/* город и координаты — отдельной колонкой правее точки: в узкой колонке координаты переносились под точку, и линия маршрута
+   их перечёркивала (проверка 2026-10-07, 960–980) */
+.map__node i { margin-top: 3px; }
+.map__lbl { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; min-width: 0; padding-top: 1px; }
 .map__node i { flex: none; width: 15px; height: 15px; border-radius: 50%; border: 1px solid rgb(21 22 26 / .5); background: var(--color-bg); transition: background-color .8s var(--ease), border-color .8s var(--ease), box-shadow .8s var(--ease); }
 .map__stop.is-on .map__node i { background: var(--color-accent); border-color: var(--color-accent); box-shadow: 0 0 0 6px rgb(111 83 29 / .14); }
 .map__city { font-weight: 600; }

@@ -357,7 +357,9 @@ html:not(.js) .cant__count, html:not(.js) .cant__foot { display: none; }   /* б
 .cant__x path { fill: none; stroke: color-mix(in srgb, #d6b273 calc(var(--k) * 100%), var(--color-accent)); stroke-width: 2.6; stroke-linecap: square; stroke-dasharray: 1; stroke-dashoffset: 0; transition: stroke-dashoffset .6s var(--ease); }
 .cant__x path + path { transition-delay: .22s; }
 .cant.is-pinned .cant__card:not(.is-seen) .cant__x path { stroke-dashoffset: 1; }
-.cant__card h3 { margin: var(--space-4) 0 12px; font-size: clamp(19px, 1.5vw, 26px); font-stretch: 125%; font-weight: 800; line-height: 1; letter-spacing: -.01em; text-transform: uppercase; text-wrap: balance; }
+.cant__card { container-type: inline-size; }
+/* размер — и от ширины карточки (проверка 2026-10-07: «ПЕРЕПРОДАЖУ» выходило из карточки на 901–1024) */
+.cant__card h3 { margin: var(--space-4) 0 12px; font-size: clamp(14px, min(1.5vw, 7cqi), 26px); font-stretch: 125%; font-weight: 800; line-height: 1; letter-spacing: -.01em; text-transform: uppercase; text-wrap: balance; }
 .cant__card p { margin: 0; color: color-mix(in srgb, #a9abb2 calc(var(--k) * 100%), var(--color-muted)); font-size: 16px; line-height: 1.5; }
 /* текущая карточка — тёмная, номер и крест — светлой шампанью (через --on, см. выше) */
 .cant__foot { display: flex; align-items: center; gap: 10px; padding: 0 var(--gutter); }
@@ -584,7 +586,7 @@ html.has-lightbox { overflow: hidden; }
   .pay__proof li { font-size: 15px; }
   .pay__note { display: none; }
   .cant__card { width: min(78vw, 360px); --card-h: min(46svh, 400px); }
-  .cant__card h3 { margin-top: var(--space-3); font-size: clamp(18px, 5vw, 22px); font-stretch: 115%; }
+  .cant__card h3 { margin-top: var(--space-3); font-size: clamp(14px, min(5vw, 7.4cqi), 22px); font-stretch: 115%; }
   .cant__card p { font-size: 15px; }
   .cant__num { font-size: 64px; }
   .ticket { padding: 20px; }
@@ -594,6 +596,16 @@ html.has-lightbox { overflow: hidden; }
      машине (правка 2026-10-06 по итогам проверки). Подложка — от начала текста (52svh), той же S-кривой */
   .contact::before { background: linear-gradient(180deg, rgb(11 14 22 / 0) calc(52svh - 150px + 0px), rgb(11 14 22 / 0.04) calc(52svh - 150px + 25px), rgb(11 14 22 / 0.147) calc(52svh - 150px + 50px), rgb(11 14 22 / 0.297) calc(52svh - 150px + 75px), rgb(11 14 22 / 0.47) calc(52svh - 150px + 100px), rgb(11 14 22 / 0.643) calc(52svh - 150px + 125px), rgb(11 14 22 / 0.793) calc(52svh - 150px + 150px), rgb(11 14 22 / 0.9) calc(52svh - 150px + 175px), rgb(11 14 22 / 0.94) calc(52svh - 150px + 200px)); }
 }
+/* высокий планшет (768×1024; проверка 2026-10-07: нижняя треть «Оплаты» и «Не привезём» была пустой) */
+@media (min-width: 601px) and (max-width: 900px) and (min-height: 900px) {
+  .js .pay__stage { padding-top: calc(var(--header-offset) + 26svh); }
+  .js .pay__head .lead { display: block; margin-top: var(--space-2); }
+  .pay__card { padding: 32px; gap: var(--space-3); }
+  .pay__card .num { font-size: clamp(36px, 9cqi, 60px); }
+  .pay__what { font-size: 16px; }
+  .pay__proof li { font-size: 17px; }
+  .cant__card { width: min(48vw, 400px); --card-h: min(54svh, 560px); }
+}
 @media (max-width: 900px) and (max-height: 600px) { .js .route { height: auto; } .js .route__stage { position: relative; height: auto; } }
 /* телефон, закреплённая сцена: день пути и этап — под линией маршрута (правка 2026-10-06 по итогам проверки: заголовок,
    счётчик и машина стояли в верхней половине экрана, ниже — пустой фон); --floor-y — высота линии, ставит showroom.js */
@@ -602,12 +614,22 @@ html.has-lightbox { overflow: hidden; }
   .js .route__via { display: block; grid-column: 1 / -1; margin-top: 14px !important; }
 }
 /* низкие окна: абзацы оплаты и ленты прячем; на телефоне без места оплата не закрепляется — карточки списком */
+/* невысокое окно компьютера (≤640px; проверка 2026-10-07: ноутбук 125% с панелями браузера — у страницы ~570px):
+   «Оплата» — заголовок мельче, пояснение суммы в карточке скрыто, отступ сверху меньше — стопка не закрывает заголовок;
+   «Пока другие ждут» — текст ниже, не лежит на колёсах (машина не меняется) */
+@media (min-width: 901px) and (max-height: 640px) {
+  .js .pay__stage { padding-top: max(calc(var(--header-offset) + 12px), 16vh); }
+  .pay__head h2 { font-size: min(var(--text-h2), 7.4vh); }
+  .js .pay__what { display: none; }
+  .js .pay__stack { padding-top: 40px; }
+  .js .speed__stage { padding-bottom: clamp(16px, 3.5vh, 32px); }
+}
 /* сноска «Суммы — пример…» на невысоком окне компьютера — тоже: стопка прижата к низу и иначе наезжает на абзац (правка 2026-10-07) */
 @media (min-width: 901px) and (max-height: 820px) { .js .pay__note { display: none; } }
 @media (max-height: 760px) { .js .pay__head .lead, .js .pay__note { display: none; } .js .pay__head h2 { margin-bottom: 0; } .cant.is-pinned .cant__head .lead { display: none; } }
 @media (max-width: 900px) and (max-height: 760px) { .js .pay__stage { padding-top: calc(var(--header-offset) + 15svh); } .js .pay__paid-of { display: none; } }
 /* короткий телефон: в карточке — этап, сумма и что уже есть до платежа; пояснение суммы прячем, чтобы карточка влезла */
-@media (max-width: 900px) and (max-height: 700px) { .js .pay__stage { padding-top: calc(var(--header-offset) + 12svh); } .js .pay__what, .js .pay__proof > p { display: none; } .js .pay__stack { padding-top: 28px; } }
+@media (max-width: 900px) and (max-height: 700px) { .js .pay__stage { padding-top: calc(var(--header-offset) + 16svh); } .js .pay__what, .js .pay__proof > p { display: none; } .js .pay__stack { padding-top: 28px; } }
 @media (max-width: 900px) and (max-height: 600px) {
   .js .pay { height: auto; } .js .pay__stage { position: relative; height: auto; }
   .js .pay__stack { gap: var(--space-2); padding-top: 0; } .js .pay__card { grid-area: auto; transform: none; } .js .pay__card::after { display: none; }
