@@ -1,0 +1,219 @@
+/* Общее оформление всех страниц. Значения — только из tokens.css. Композиция секций — по DESIGN.md. */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: var(--header-offset); }   /* якорь не прячется под шапку */
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }   /* переход по меню — плавной прокруткой */
+body { margin: 0; background: var(--color-bg); color: var(--color-text); font-family: var(--font-body); font-size: var(--text-base); line-height: 1.55; }
+img, video { max-width: 100%; height: auto; display: block; }
+button, input, textarea, select { font: inherit; }
+.container { width: 100%; max-width: var(--container); margin-inline: auto; padding-inline: var(--gutter); }
+/* 404 и юридические страницы: отступ от шапки (на телефоне заголовок стоял в 4px от неё — правка 2026-10-06 по итогам проверки) */
+main.container { padding-block: clamp(40px, 6vw, 96px) var(--space-section); }
+h1, h2, h3 { font-family: var(--font-heading); line-height: 1.1; margin: 0 0 var(--space-3); text-wrap: balance; }
+h1 { font-size: var(--text-h1); }
+h2 { font-size: var(--text-h2); }
+p, li { max-width: 65ch; }
+a { color: var(--color-accent); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+
+.button { display: inline-flex; align-items: center; justify-content: center; min-height: var(--control-height); padding: 12px var(--space-3); border: 0; border-radius: var(--radius); background: var(--color-accent); color: var(--color-accent-text); text-decoration: none; font-weight: 600; cursor: pointer; transition: background-color var(--transition-soft) var(--ease), opacity var(--transition-soft); }
+.button:disabled { opacity: .5; cursor: not-allowed; }
+.button--small { min-height: var(--control-height-small); padding: 8px var(--space-2); font-size: var(--text-small); }
+.button--ghost { background: transparent; color: var(--color-text); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-text) 38%, transparent); }   /* вторичное действие рядом с главной кнопкой */
+
+/* Шапка — одна на всех страницах: закреплена сверху. Пока страница в самом верху (или пока виден первый экран
+   с атрибутом data-header-clear), фона и линии нет — класс is-clear ставит header-stick.js. Без JS фон есть всегда. */
+[data-include="header"] { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--color-bg) 94%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom: 1px solid var(--color-line); transition: background-color .5s var(--ease), border-color .5s var(--ease); }
+/* без JS шапка — строка ссылок из разметки (header.js её не заменил): аккуратная строка вместо голых ссылок.
+   Не по классу js у html: на юридических страницах и 404 его нет, а шапка там собирается скриптом */
+[data-include="header"]:not(:has(.site-header)) { padding: 24px var(--gutter); color: var(--color-muted); font-size: 15px; }
+[data-include="header"] > a { color: var(--color-text); text-decoration: none; }
+[data-include="header"] > a:first-child { font-family: var(--font-heading); font-stretch: var(--font-stretch-display, 100%); font-weight: 800; text-transform: uppercase; margin-right: 12px; }
+[data-include="header"].is-clear { background: transparent; border-bottom-color: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.site-header { display: flex; align-items: center; gap: var(--space-3); flex-wrap: nowrap; max-width: var(--container); min-height: 72px; margin: 0 auto; padding: var(--space-1) var(--gutter); }
+.site-header__name { font-family: var(--font-heading); font-stretch: var(--font-stretch-display, 100%); font-weight: 800; font-size: 18px; letter-spacing: .02em; text-transform: uppercase; text-decoration: none; color: var(--color-text); white-space: nowrap; }
+/* шрифты шапки и подвала крупнее (правка 2026-10-04, четвёртый пакет) */
+.site-header__nav a { font-size: clamp(14px, 1.1vw, 16px); color: var(--color-muted); transition: color var(--transition-soft) var(--ease); }
+.site-header__nav { display: flex; gap: clamp(16px, 1.6vw, 28px); flex-wrap: wrap; margin-left: auto; }
+.site-header .button--small { font-size: 15px; }
+.site-header__nav a { text-decoration: none; }
+/* Планшет и телефон (≤1023px; правка 2026-10-07, адаптив 901: до 900px — пунктам меню на 901–1023 было тесно):
+   меню — за кнопкой с двумя полосками, список разделов открывается под шапкой на весь экран (header.js). На компьютере кнопки нет. */
+.site-header__toggle { display: none; }
+/* Кнопка шапки: на телефоне — короткая подпись (config.js → cta.short) */
+.cta-short { display: none; }
+@media (max-width: 600px) { .cta-long { display: none; } .cta-short { display: inline; } }
+@media (max-width: 900px) {
+  .site-header { justify-content: space-between; gap: var(--space-2); min-height: 60px; }
+  .site-header__name { font-size: clamp(12px, 3.4vw, 14px); }   /* крупнее, но кнопка шапки помещается и на 360px */
+}
+@media (max-width: 1023px) {
+  .site-header__nav { display: none; }
+  .site-header { position: relative; }
+  .site-header__name { margin-right: auto; }
+  .site-header__toggle { display: grid; place-content: center; gap: 7px; flex: none; width: 44px; height: 44px; padding: 0; border: 1px solid var(--color-line); border-radius: var(--radius); background: transparent; color: var(--color-text); cursor: pointer; }
+  .site-header__toggle i { display: block; width: 18px; height: 1.5px; background: currentColor; transition: transform .45s var(--ease); }
+  .is-open .site-header__toggle i:first-child { transform: translateY(4.25px) rotate(45deg); }
+  .is-open .site-header__toggle i:last-child { transform: translateY(-4.25px) rotate(-45deg); }
+  /* фон меню — на весь экран под шапкой (правка 2026-10-07): страница под ним не видна и не прокручивается */
+  .site-header.is-open .site-header__nav { position: absolute; left: 0; right: 0; top: 100%; height: calc(100dvh - 100%); display: grid; align-content: start; gap: 0; margin: 0;
+    padding: 4px var(--gutter) var(--space-3); overflow-y: auto; overscroll-behavior: contain; background: var(--color-bg); animation: nav-in .45s var(--ease); }
+  html.is-menu-open { overflow: hidden; scrollbar-gutter: stable; }   /* место полосы прокрутки остаётся — шапка не прыгает */
+  .site-header.is-open .site-header__nav a { display: flex; align-items: center; min-height: 52px; border-top: 1px solid var(--color-line); font-size: 18px; color: var(--color-text); }
+  .site-header.is-open .site-header__nav a:first-child { border-top: 0; }
+  /* меню открыто над первым экраном — у шапки фон, иначе список висел бы под прозрачной полосой */
+  [data-include="header"].is-menu { background: var(--color-bg); }
+}
+/* узкий телефон: логотип чуть уже (ширина шрифта 150%) и зазоры меньше — логотип, меню и кнопка помещаются от 360px */
+@media (max-width: 600px) {
+  .site-header { gap: 8px; }
+  .site-header__name { font-stretch: 150%; font-size: clamp(11px, 3.2vw, 14px); }
+  .site-header__toggle { width: 40px; height: 40px; }
+}
+@keyframes nav-in { from { transform: translateY(-10px); } }   /* только сдвиг: если анимация не стартует, меню всё равно видно */
+@media (max-width: 1023px) and (prefers-reduced-motion: reduce) { .site-header.is-open .site-header__nav { animation: none; } .site-header__toggle i { transition: none; } }
+/* Подвал — полноценный блок: бренд и кнопка, разделы, связь, документы; внизу пометка концепта и авторство. */
+[data-include="footer"] { border-top: 1px solid var(--color-line); background: var(--color-bg); position: relative; z-index: 2; }
+.site-footer { display: grid; grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr)); gap: var(--space-4) var(--space-3); max-width: var(--container); margin: 0 auto; padding: var(--space-5) var(--gutter) var(--space-4); color: var(--color-muted); font-size: 16px; }
+.site-footer a { color: inherit; }
+.site-footer .button { color: var(--color-accent-text); text-decoration: none; }
+.site-footer__brand { display: grid; gap: var(--space-2); justify-items: start; align-content: start; }
+.site-footer__brand p { margin: 0; }
+.site-footer__name { font-family: var(--font-heading); font-stretch: var(--font-stretch-display, 100%); font-weight: 800; font-size: 22px; text-transform: uppercase; color: var(--color-text); }
+.site-footer__tagline { max-width: 40ch; }
+.site-footer__col { display: grid; gap: 10px; align-content: start; }
+.site-footer__head { margin: 0 0 4px; color: var(--color-text); font-weight: 600; font-size: 17px; }
+.site-footer__col a { text-decoration: none; }
+.site-footer__msg { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.site-footer__bottom { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); padding-top: var(--space-3); border-top: 1px solid var(--color-line); font-size: 14px; }
+.site-footer__bottom p { margin: 0; max-width: none; }
+@media (max-width: 900px) { .site-footer { grid-template-columns: 1fr 1fr; } .site-footer__brand { grid-column: 1 / -1; } }
+@media (max-width: 480px) { .site-footer { grid-template-columns: 1fr; } }
+
+/* Кнопка со стрелкой в квадрате справа (приём референса). */
+.button--arrow { gap: 0; padding: 0 0 0 var(--space-3); overflow: hidden; align-items: stretch; }
+.button--arrow > span { display: flex; align-items: center; padding-right: var(--space-3); white-space: nowrap; }
+.button--arrow > i { display: grid; place-items: center; width: var(--control-height); margin-left: auto; background: rgb(0 0 0 / .12); font-style: normal; transition: background-color var(--transition-soft) var(--ease); }
+
+.contacts { display: flex; flex-wrap: wrap; gap: var(--space-1); list-style: none; margin: 0; padding: 0; }
+.contacts__link { transition: border-color var(--transition-soft) var(--ease); display: inline-flex; align-items: center; min-height: var(--control-height-small); padding: 8px var(--space-2); border: 1px solid var(--color-line); border-radius: var(--radius); color: var(--color-text); text-decoration: none; }
+
+.form { display: grid; gap: var(--space-2); max-width: 480px; }
+.form label { display: grid; gap: 4px; }
+.form input, .form textarea { min-height: var(--control-height); padding: 10px 14px; border: 1px solid var(--color-line); border-radius: var(--radius); background: var(--color-surface); color: var(--color-text); }
+.form .form__consent { display: flex; gap: var(--space-1); align-items: flex-start; font-size: var(--text-small); }
+.form .form__consent input { min-height: 0; margin-top: 4px; }
+.form__note, [data-form-status] { margin: 0; font-size: var(--text-small); color: var(--color-muted); }
+
+.cookie-banner { position: fixed; left: var(--space-2); right: var(--space-2); bottom: var(--space-2); z-index: 50; display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; max-width: 720px; margin-inline: auto; padding: var(--space-2) var(--space-3); border: 1px solid var(--color-line); border-radius: var(--radius); background: var(--color-surface); box-shadow: 0 8px 24px rgb(0 0 0 / .08); font-size: var(--text-small); }
+.cookie-banner p { margin: 0; flex: 1 1 260px; }
+
+.legal-draft { padding: var(--space-2); border: 1px dashed var(--color-line); background: var(--color-surface); }
+
+/* Анкета «Рассчитать под ключ» (brief.js; правка 2026-10-06, образец — only.digital/#brief): отдельная страница
+   на «бумаге» выезжает снизу поверх сайта с мягким разгоном и торможением (0,9 с), сайт под ней гаснет;
+   своя шапка с названием и крестиком, вопросы — строками через линии: номер и вопрос слева, ответы справа. */
+.brief { --color-bg: #ece8df; --color-surface: #f7f5f0; --color-text: #15161a; --color-muted: #5b5d66; --color-line: #d4cfc4;
+  --color-accent: #6f531d; --color-accent-hover: #84662a; --color-accent-text: #fff8ec;
+  position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: transparent; color: var(--color-text); overflow: clip; }
+/* overflow: clip, а не hidden: окно анкеты не прокручивается вовсе. С hidden браузер при открытии прокручивал его на высоту
+   экрана к кнопке-крестику в ещё не выехавшем листе — лист вставал сразу, строки «скакали» (правка 2026-10-06) */
+.brief[open] { display: block; }
+.brief::backdrop { background: transparent; }
+html.has-brief { overflow: hidden; }
+.brief__bg { position: absolute; inset: 0; background: rgb(11 14 22 / .75); opacity: 0; transition: opacity .8s var(--ease); }
+.brief__sheet { position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain; background: var(--color-bg);
+  transform: translate3d(0, 100%, 0); transition: transform .8s cubic-bezier(.65, 0, .35, 1); }
+.brief.is-shown .brief__bg { opacity: 1; }
+.brief.is-shown .brief__sheet { transform: none; transition-duration: .9s; }
+/* содержимое доезжает снизу вслед за листом, строки — по очереди */
+.brief__intro, .brief__row, .brief__done { opacity: 0; transform: translate3d(0, 32px, 0); transition: opacity .5s var(--ease), transform .5s var(--ease); }
+.brief.is-shown .brief__intro, .brief.is-shown .brief__row, .brief.is-shown .brief__done { opacity: 1; transform: none; transition-duration: .9s; transition-delay: calc(.35s + var(--i, 0) * .07s); }
+
+.brief__head { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); min-height: 72px; padding: var(--space-1) var(--gutter);
+  background: color-mix(in srgb, var(--color-bg) 92%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom: 1px solid var(--color-line); }
+.brief__logo { font-family: var(--font-heading); font-stretch: var(--font-stretch-display, 100%); font-weight: 800; font-size: 18px; letter-spacing: .02em; text-transform: uppercase; white-space: nowrap; }
+.brief__close { flex: none; width: 48px; height: 48px; padding: 0; border: 1px solid var(--color-line); border-radius: var(--radius); cursor: pointer;
+  background: linear-gradient(45deg, transparent calc(50% - 1px), var(--color-text) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) 50% 50% / 20px 20px no-repeat,
+    linear-gradient(-45deg, transparent calc(50% - 1px), var(--color-text) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) 50% 50% / 20px 20px no-repeat, var(--color-surface);
+  transition: border-color var(--transition-soft) var(--ease); }
+
+.brief__body { padding: clamp(40px, 6vw, 104px) var(--gutter) var(--space-section); }
+.brief__intro { container-type: inline-size; padding-bottom: clamp(32px, 4vw, 64px); }
+.brief__title { margin: 0 0 var(--space-3); font-family: var(--font-heading); font-stretch: var(--font-stretch-display); font-weight: 800; text-transform: uppercase;
+  font-size: clamp(26px, 3.1cqi, 72px); line-height: .95; letter-spacing: -.02em; text-wrap: initial; }   /* «Рассчитаем вашу машину» в одну строку — от ширины колонки (L38) */
+.brief__t1, .brief__t2 { display: block; white-space: nowrap; }
+.brief__t2 { color: var(--color-accent); }
+.brief__lead { margin: 0; max-width: 60ch; color: var(--color-muted); }
+
+.brief__row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: var(--space-3) var(--space-4); padding-block: clamp(28px, 3.2vw, 48px); border-top: 1px solid var(--color-line); }
+.brief__row--send .brief__fields { grid-column: 2; }
+.brief__h { display: flex; gap: 14px; align-items: baseline; margin: 0; font-family: var(--font-heading); font-stretch: 150%; font-weight: 700; font-size: clamp(18px, 1.5vw, 24px); line-height: 1.15; text-transform: uppercase; }
+.brief__n { font-family: var(--font-body); font-stretch: 100%; font-weight: 400; font-size: var(--text-small); color: var(--color-muted); font-variant-numeric: tabular-nums; }
+.brief__fields { display: grid; gap: var(--space-3); align-content: start; min-width: 0; max-width: 880px; }
+.brief__sub { margin: 0 0 calc(var(--space-2) * -1); font-size: var(--text-small); color: var(--color-muted); }
+
+.brief__chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.brief-chip { position: relative; display: inline-flex; }
+.brief-chip input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.brief-chip span { display: inline-flex; align-items: center; min-height: var(--control-height-small); padding: 8px 18px; border: 1px solid var(--color-line); border-radius: var(--radius); background: var(--color-surface); font-size: 16px; line-height: 1.2;
+  transition: background-color var(--transition-soft) var(--ease), border-color var(--transition-soft) var(--ease), color var(--transition-soft) var(--ease); }
+.brief-chip input:checked + span { border-color: var(--color-text); background: var(--color-text); color: var(--color-bg); }
+.brief-chip input:focus-visible + span { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+.brief__est { margin: 0; color: var(--color-muted); }
+.brief__est b { font-family: var(--font-heading); font-stretch: 150%; font-weight: 700; font-size: 20px; color: var(--color-text); white-space: nowrap; }
+
+.brief-field { display: grid; gap: 6px; font-size: var(--text-small); color: var(--color-muted); }
+.brief-field input, .brief-field textarea, .brief-tel { width: 100%; min-height: var(--control-height); padding: 14px 16px; border: 1px solid var(--color-line); border-radius: var(--radius); background: var(--color-surface); color: var(--color-text); font-size: 17px;
+  transition: border-color var(--transition-soft) var(--ease); }
+.brief-field textarea { min-height: 120px; resize: vertical; }
+.brief-field input::placeholder, .brief-field textarea::placeholder { color: color-mix(in srgb, var(--color-muted) 70%, transparent); }
+.brief-field input:focus, .brief-field textarea:focus, .brief-tel:focus-within { outline: none; border-color: var(--color-text); }
+.brief-tel { display: flex; align-items: center; gap: 10px; padding-block: 0; }
+.brief-tel b { font-weight: 400; color: var(--color-text); }
+.brief-tel input { flex: 1; min-width: 0; min-height: calc(var(--control-height) - 2px); padding: 0; border: 0; background: transparent; }
+.brief-field [aria-invalid], .brief-tel:has([aria-invalid]) { border-color: #a3341f; }
+.brief__pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); }
+
+.brief__consent { display: flex; gap: 10px; align-items: flex-start; max-width: 60ch; font-size: var(--text-small); color: var(--color-muted); }
+.brief__consent input { flex: none; width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--color-text); }
+.brief__consent a { color: var(--color-text); }
+.brief__error { margin: 0; font-size: var(--text-small); color: #a3341f; }
+.brief__send { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
+
+.brief__done { display: grid; gap: var(--space-3); justify-items: start; max-width: 60ch; padding-top: clamp(28px, 3.2vw, 48px); border-top: 1px solid var(--color-line); }
+.brief__done[hidden] { display: none; }
+.brief__done p { margin: 0; }
+.brief__done:focus { outline: none; }
+
+@media (max-width: 900px) {
+  .brief__head { min-height: 60px; }
+  .brief__logo { font-size: clamp(12px, 3.4vw, 14px); }
+  .brief__close { width: 44px; height: 44px; }
+  .brief__title { font-stretch: 132%; font-size: clamp(24px, 7.4cqi, 44px); }
+  .brief__t1 { white-space: normal; }
+  .brief__row { grid-template-columns: 1fr; gap: var(--space-2); }
+  .brief__row--send .brief__fields { grid-column: auto; }
+  .brief-chip span { padding-inline: 14px; font-size: 15px; }
+}
+@media (max-width: 600px) {
+  .brief__pair { grid-template-columns: 1fr; }
+  .brief__send .button--arrow { width: 100%; justify-content: space-between; }
+}
+@media (hover: hover) {
+  .brief__close:hover { border-color: var(--color-text); }
+  .brief-chip:hover input:not(:checked) + span { border-color: var(--color-text); }
+}
+
+@media (hover: hover) {
+  .button:not(:disabled):hover { background: var(--color-accent-hover); }
+  .button--ghost:not(:disabled):hover { background: color-mix(in srgb, var(--color-text) 8%, transparent); }
+  .site-header__nav a:hover { color: var(--color-text); }
+  .site-footer__col a:hover, .site-footer__bottom a:hover { color: var(--color-text); }
+  .button--arrow:not(:disabled):hover > i { background: rgb(0 0 0 / .2); }
+  a:hover { text-decoration-thickness: 2px; }
+  .contacts__link:hover { border-color: var(--color-text); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; scroll-behavior: auto !important; }
+}

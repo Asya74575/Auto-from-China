@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- seo:start -->
+<title>Авто из Китая под ключ в Минске — расчёт по строкам | Восток Драйв</title>
+<meta name="description" content="Новые автомобили из Китая под ключ: подбор, проверка на площадке, доставка, растаможка в Минске. Калькулятор цены по строкам, срок 45–60 дней. Концепт для портфолио.">
+<link rel="canonical" href="https://example.com/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Авто из Китая под ключ в Минске — расчёт по строкам | Восток Драйв">
+<meta property="og:description" content="Новые автомобили из Китая под ключ: подбор, проверка на площадке, доставка, растаможка в Минске. Калькулятор цены по строкам, срок 45–60 дней. Концепт для портфолио.">
+<meta property="og:url" content="https://example.com/">
+<meta property="og:image" content="https://example.com/img/og-car.jpg">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:site_name" content="Восток Драйв">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","name":"Восток Драйв","url":"https://example.com/","inLanguage":"ru"},{"@type":"Organization","name":"Восток Драйв","url":"https://example.com/"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Сколько ждать машину?","acceptedAnswer":{"@type":"Answer","text":"45–60 дней от оплаты до ключей в Минске: 3–5 дней на подбор и договор, 7–10 — проверка и выкуп, 5–7 — погрузка, 25–28 — железная дорога через Казахстан и Россию, остальное — таможня и выдача."}},{"@type":"Question","name":"Из чего складывается цена?","acceptedAnswer":{"@type":"Answer","text":"Цена машины в Китае, доставка $2 800 до Минска, пошлина по ставкам РБ, утильсбор и сборы, фиксированная услуга 1 500 BYN. Все строки — в калькуляторе на странице."}},{"@type":"Question","name":"Что с гарантией?","acceptedAnswer":{"@type":"Answer","text":"Заводская гарантия на машину для китайского рынка действует в Китае. В Минске подскажем сервис, который работает с маркой, и передадим документы и фотоотчёт."}},{"@type":"Question","name":"Будет ли русский язык в машине?","acceptedAnswer":{"@type":"Answer","text":"У многих моделей для Китая меню только на китайском и английском. Проверяем русификацию до покупки и заранее говорим, если её нет."}},{"@type":"Question","name":"Как заряжать электромобиль?","acceptedAnswer":{"@type":"Answer","text":"Китайские машины используют разъём GB/T. До покупки проверим, какие станции и домашняя зарядка вам подойдут, и при необходимости подберём переходник."}},{"@type":"Question","name":"Машина застрахована в пути?","acceptedAnswer":{"@type":"Answer","text":"Да, страховка груза включена в стоимость доставки $2 800."}},{"@type":"Question","name":"В какой валюте платить?","acceptedAnswer":{"@type":"Answer","text":"В белорусских рублях по курсу Нацбанка на день платежа, в три этапа."}},{"@type":"Question","name":"Есть ли льгота на электромобили?","acceptedAnswer":{"@type":"Answer","text":"Есть квота 2026 года: в её пределах физлицо не платит пошлину. Сверх квоты — 15%. Гибридам льгота не положена. Остаток квоты проверяем перед договором."}}]}</script>
+<!-- seo:end -->
+<script>document.documentElement.classList.add('js');
+// прелоадер первого экрана (home.js): пока он идёт, шапка, заголовок и панель скрыты (класс hero-wait). Страховка — 9 с,
+// если скрипты не догрузились. При reduce и на снимках проверки (webdriver) прелоадера нет.
+if (!matchMedia('(prefers-reduced-motion: reduce)').matches && !navigator.webdriver) {
+  document.documentElement.classList.add('hero-wait');
+  setTimeout(function () { var h = document.documentElement; if (h.classList.contains('hero-wait')) { h.classList.remove('hero-wait'); document.dispatchEvent(new Event('hero:open')); } }, 9000);
+}</script>
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/home.css">
+<link rel="stylesheet" href="assets/css/scenes.css">
+</head>
+<body>
+<div data-include="header"><a href="index.html">Восток Драйв</a> · <a href="#models">Модели</a> · <a href="#calc">Расчёт</a> · <a href="#route">Путь машины</a> · <a href="#pay">Оплата</a> · <a href="#faq">Вопросы</a></div>
+
+<canvas class="showroom" data-showroom data-car="zeekr-7x" data-models="assets/models/" data-wait-ready aria-hidden="true"></canvas>
+
+<main>
+  <!-- 1. Первый экран (правка 2026-10-04, приём «Появления» по vision.avatr.com): прелоадер «Сначала проверка — потом оплата»
+       с линией загрузки, затем снизу поднимается «окно» и раскрывается на весь экран, в нём — монтаж планов машины
+       (то, что проверяем на площадке); поверх — заголовок, кнопка, срок и цвет. Окно и монтаж — showroom.js (ключи intro, reel),
+       прелоадер и подписи планов — home.js. Без JS, без WebGL и при reduce — сразу заголовок и машина анфас. -->
+  <section class="hero" data-hero data-header-clear
+    data-scene='{"intro":1,"reel":1,"az":24,"el":3,"close":1,"fit":0.6,"fitH":0.6,"shiftX":0.12,"lookY":0.42,"band":["[data-include=\"header\"]",".hero__title"],
+      "dim":1,"lights":0,"amb":0,"cool":1,"pool":0.6,"skyK":1,"sky1":"#2a3350","sky2":"#0b0e16","bg":"#0b0e16",
+      "phone":{"fit":0.95,"shiftX":0,"band":[".hero__title",".hero__bar"]}}'>
+    <img class="poster" src="img/car-front-1600.webp" srcset="img/car-front-800.webp 800w, img/car-front-1600.webp 1600w" sizes="(max-width: 900px) 92vw, 860px" width="1600" height="900" alt="Zeekr 7X анфас с включёнными фарами в тёмном зале">
+    <div class="hero__intro" aria-hidden="true">
+      <p class="hero__kicker">Фотоотчёт с площадки</p>
+      <p class="hero__slogan"><span>Сначала проверка&nbsp;—</span> <span>потом оплата.</span></p>
+      <div class="hero__load">
+        <div class="hero__loadbar"><i></i></div>
+        <p class="hero__count"><span data-hero-count>0</span> фото и видео</p>
+      </div>
+    </div>
+    <h1 class="hero__title display"><span>Авто из Китая</span><span class="accent">под ключ</span></h1>
+    <div class="hero__bar">
+      <div>
+        <p class="lead">Подберём, проверим на площадке в Китае, привезём и растаможим в Минске. <b>Цену под ключ считаем заранее&nbsp;— по строкам</b>, без «уточним потом».</p>
+        <a class="button button--arrow" href="#contacts" data-brief><span>Рассчитать под ключ</span><i aria-hidden="true">↘</i></a>
+      </div>
+      <div class="hero__fact">
+        <div class="num">45–60<small>дней</small></div>
+        <p>от оплаты до ключей в Минске</p>
+      </div>
+      <div class="paint">
+        <p class="paint__label">Цвет кузова: <b data-paint-name>Кармин</b></p>
+        <div class="paint__list">
+          <button class="swatch" type="button" style="--sw:#7a0d12" data-paint="#6e0b10" data-name="Кармин" aria-pressed="true" aria-label="Кармин"></button>
+          <button class="swatch" type="button" style="--sw:#d9d5cc" data-paint="#cfcac0" data-name="Перламутр" aria-pressed="false" aria-label="Перламутр"></button>
+          <button class="swatch" type="button" style="--sw:#2b2e34" data-paint="#1f2227" data-name="Графит" aria-pressed="false" aria-label="Графит"></button>
+          <button class="swatch" type="button" style="--sw:#1c2f4f" data-paint="#13254a" data-name="Ночной синий" aria-pressed="false" aria-label="Ночной синий"></button>
+        </div>
+      </div>
+      <!-- подпись плана монтажа: что проверяем на площадке (событие showroom:shot) -->
+      <p class="hero__shot" aria-hidden="true"><b data-shot-n>Проверка 05/05</b><span data-shot-label>VIN и комплектация</span></p>
+    </div>
+  </section>
+
+  <!-- 2. Почему из Китая: машина в профиль, факты списком. fitH задан явно (правка 2026-10-07, окно 1890×861: «авто
+       смотрится мелко»): раньше блок наследовал высоту машины от полосы первого экрана, и на невысоком окне машина
+       мельчала; 0,415 — значение принятого 1920×1080 -->
+  <section class="section why" id="why"
+    data-scene='{"az":90,"el":4,"fit":0.5,"fitH":0.415,"shiftX":0.2,"shiftY":0.04,"lookY":0.5,"intro":0,"reel":0,"close":1,"lookX":0,"lookZ":0,"amb":1,"cool":0,"pool":1,"skyK":1,"sky1":"#2a3350","sky2":"#0b0e16",
+      "phone":{"az":90,"el":5,"fit":0.92,"shiftX":0,"shiftY":-0.22},
+      "at":[[1150,{"fit":0.46,"shiftX":0.24}]]}'>
+    <div class="inner">
+      <div class="why__col">
+        <h2 class="display">Почему <span class="accent">из Китая</span></h2>
+        <ol class="points">
+          <li data-n="1"><div><b>Цена китайского рынка</b><span>Платите цену машины в Китае, доставку, таможню и нашу услугу&nbsp;— без дилерской наценки.</span></div></li>
+          <li data-n="2"><div><b>Новые модели раньше салонов</b><span>Привозим то, что продаётся в Китае сейчас,&nbsp;— включая версии, которых нет у дилеров в Минске.</span></div></li>
+          <li data-n="3"><div><b>Машина проверена до оплаты</b><span>Больше 100 фото и видео с площадки, сверка VIN и комплектации. Платите за ту машину, которую видели.</span></div></li>
+          <li data-n="4"><div><b>Русский язык и сервис</b><span>Проверяем русификацию до покупки и подсказываем сервис в Минске, который работает с маркой.</span></div></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Модели: выбор меняет машину в зале. Ракурс — 3/4 спереди слева, нос смотрит к списку: новая машина встаёт
+       передом к зрителю (правка 2026-10-04; прежний ракурс 3/4 сзади показывал машины задом). Машина крупнее — fit 0,58,
+       fitH 0,7 (правка 2026-10-05: «мелко смотрится»; было 0,48 и 0,5 по высоте) -->
+  <section class="section models" id="models"
+    data-scene='{"az":-36,"el":9,"fit":0.58,"fitH":0.7,"shiftX":-0.21,"shiftY":0.05,"lookY":0.45,
+      "phone":{"az":-30,"el":10,"fit":0.98,"fitH":0.5,"shiftX":0,"shiftY":-0.22},
+      "at":[[1279,{"fit":0.5,"shiftX":-0.25}],[1150,{"fit":0.46,"shiftX":-0.275}]]}'>
+    <div class="inner">
+      <div class="models__col">
+        <h2 class="display">Что можно <span class="accent">привезти</span></h2>
+        <p class="lead">Любую модель с китайского рынка. Шесть популярных&nbsp;— для примера: выберите, и она выедет в зал.</p>
+        <ul class="mlist">
+          <li><button class="mrow" type="button" data-model-pick="zeekr-7x" aria-pressed="true" style="--sw:#cfcac0"><i></i><span><b>Zeekr 7X</b><small>Электро · кроссовер</small></span><span>от ¥229 900</span></button></li>
+          <li><button class="mrow" type="button" data-model-pick="xiaomi-su7" aria-pressed="false" style="--sw:#13254a"><i></i><span><b>Xiaomi SU7</b><small>Электро · седан</small></span><span>от ¥215 900</span></button></li>
+          <li><button class="mrow" type="button" data-model-pick="li-l9" aria-pressed="false" style="--sw:#1f2227"><i></i><span><b>Li Auto L9</b><small>Гибрид с запасом хода · большой кроссовер</small></span><span>от ¥409 800</span></button></li>
+          <li><button class="mrow" type="button" data-model-pick="byd-song-plus" aria-pressed="false" style="--sw:#6e0b10"><i></i><span><b>BYD Song Plus DM-i</b><small>Подключаемый гибрид · кроссовер</small></span><span>от ¥149 800</span></button></li>
+          <li><button class="mrow" type="button" data-model-pick="haval-dargo" aria-pressed="false" style="--sw:#7d8087"><i></i><span><b>Haval Dargo</b><small>Бензин 2.0T · кроссовер</small></span><span>от ¥139 900</span></button></li>
+          <li><button class="mrow" type="button" data-model-pick="chery-tiggo-8-pro" aria-pressed="false" style="--sw:#0c0d10"><i></i><span><b>Chery Tiggo 8 Pro</b><small>Бензин 1.6T · кроссовер, 7 мест</small></span><span>от ¥119 900</span></button></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Калькулятор под ключ -->
+  <section class="section calc theme-paper" id="calc"
+    data-scene='{"az":205,"el":16,"fit":0.42,"shiftX":0.22,"shiftY":0.1,"lookY":0.45,"dim":0,
+      "phone":{"az":205,"el":16,"fit":0.9,"shiftX":0,"shiftY":0,"dim":0}}'>
+    <!-- заголовок — на всю ширину, ниже две равные колонки: поля и чек (правка 2026-10-04: была пустота посередине) -->
+    <form class="inner" data-calc>
+      <div class="calc__head">
+        <h2 class="display">Цена под ключ&nbsp;— <span class="accent">заранее</span></h2>
+        <p class="lead">Каждая строка видна до договора: машина, доставка, таможня, сборы и наша услуга. Поменяйте модель или цену&nbsp;— итог пересчитается.</p>
+      </div>
+      <div class="calc__form">
+        <div class="fields">
+          <label class="field"><span>Модель</span>
+            <select name="model">
+              <option value="zeekr-7x" selected>Zeekr 7X&nbsp;— электро</option>
+              <option value="xiaomi-su7">Xiaomi SU7&nbsp;— электро</option>
+              <option value="li-l9">Li Auto L9&nbsp;— гибрид с запасом хода</option>
+              <option value="byd-song-plus">BYD Song Plus DM-i&nbsp;— подключаемый гибрид</option>
+              <option value="haval-dargo">Haval Dargo&nbsp;— бензин</option>
+              <option value="chery-tiggo-8-pro">Chery Tiggo 8 Pro&nbsp;— бензин</option>
+            </select>
+          </label>
+          <label class="field"><span>Цена в Китае, ¥</span><input name="price" type="number" inputmode="numeric" min="10000" max="5000000" step="100" value="229900"></label>
+          <fieldset class="field" data-quota-group>
+            <legend>Льготная квота на электромобили</legend>
+            <div class="seg">
+              <label><input type="radio" name="quota" value="over" checked><span>Сверх квоты&nbsp;— пошлина 15%</span></label>
+              <label><input type="radio" name="quota" value="in"><span>В квоте&nbsp;— без пошлины</span></label>
+            </div>
+          </fieldset>
+          <p class="calc__type" data-model-type>Электро · кроссовер</p>
+        </div>
+        <p class="small calc__rates">Пример расчёта: курсы условные (1 ¥ = 0,416 BYN, 1 $ = 3,00 BYN, 1 € = 3,45 BYN), ставки таможни РБ&nbsp;— на сентябрь 2026, новая машина до 3 лет. Точную сумму считаем под конкретную машину.</p>
+      </div>
+      <aside class="ticket" aria-label="Расчёт под ключ" aria-live="polite">
+        <p class="ticket__note">Расчёт под ключ · цены условные</p>
+        <dl>
+          <dt data-label="car">Машина в Китае</dt><dd data-value="car">95 638 BYN</dd>
+          <dt data-label="delivery">Доставка в Минск</dt><dd data-value="delivery">8 400 BYN</dd>
+          <dt data-label="duty">Пошлина 15% сверх квоты</dt><dd data-value="duty">14 346 BYN</dd>
+          <dt data-label="fees">Утильсбор, сбор, СВХ, ЭПТС</dt><dd data-value="fees">1 195 BYN</dd>
+          <dt data-label="service">Услуга «Восток Драйв»</dt><dd data-value="service">1 500 BYN</dd>
+        </dl>
+        <div class="ticket__total"><span>Итого под ключ</span><span class="num" data-value="total">121 079 BYN</span></div>
+        <p class="ticket__usd">≈ <span data-value="usd">40 360 $</span></p>
+        <button class="button button--arrow" type="button" data-calc-send><span>Отправить расчёт</span><i aria-hidden="true">↘</i></button>
+      </aside>
+    </form>
+  </section>
+
+  <!-- 5–7. Путь машины (правка 2026-10-04, третий пакет): сразу после расчёта — «Пока другие ждут» (машина на скорости),
+       «Путь машины по документам» (бумага), «45–60 дней от оплаты до ключей» (графит). Блоки «Вторая подача» по rideradian.com;
+       ракурсы — data-scene у секций и у меток .scene-key внутри (метка — точка на прокрутке; --end — последний экран секции). -->
+
+  <!-- 5. На скорости (по rideradian.com): машина в профиль, мимо летят огни; следующий блок наезжает сверху -->
+  <section class="speed" id="speed" aria-labelledby="speed-title"
+    data-scene='{"dim":1,"az":90,"el":2,"close":1,"lookY":0.45,"fit":0.56,"fitH":0.46,"shiftX":0,"shiftY":-0.1,"speed":1,"lights":1,"cool":0.6,"pool":0.15,"amb":0,"ignite":0,
+      "skyK":1,"sky1":"#2a3350","sky2":"#0b0e16","bg":"#0b0e16","cT":0,"cR":0,"cB":0,"cL":0,"cRad":0,
+      "phone":{"fit":0.95,"fitH":0.4,"shiftY":-0.12},
+      "at":[[1439,{"fit":0.64,"fitH":0.54,"shiftY":-0.13}]]}'>
+    <span class="scene-key scene-key--end" data-scene='{}'></span>
+    <div class="speed__stage">
+      <img class="poster" src="img/car-hero-1600.webp" srcset="img/car-hero-800.webp 800w, img/car-hero-1600.webp 1600w" sizes="(max-width: 900px) 92vw, 860px" width="1600" height="900" alt="Машина в тёмном зале" loading="lazy">
+      <div class="speed__text">
+        <h2 class="display" id="speed-title"><span>Пока другие ждут,</span> <span class="accent">ваша уже едет</span></h2>
+        <p>Ж/д-контейнер из Китая в Минск, страховка в пути включена. От оплаты до ключей&nbsp;— 45–60 дней.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Маршрут-карта (по rideradian.com) на «бумаге»: линия дорисовывается за прокруткой, в узлах — город, день и координаты, рядом — документы -->
+  <section class="map theme-paper" id="route-map" data-map aria-labelledby="map-title" data-scene='{"dim":0,"speed":0}'>
+    <div class="inner">
+      <header class="map__head">
+        <h2 class="display" id="map-title">Путь машины <span class="accent">по документам</span></h2>
+        <p class="lead">На каждом этапе&nbsp;— бумага, которую вы видите сами: от фотоотчёта на площадке до ЭПТС в Минске.</p>
+      </header>
+      <div class="map__field" data-map-field>
+        <svg class="map__svg" aria-hidden="true" focusable="false"><path class="map__plan" data-map-plan d=""/></svg>
+        <svg class="map__svg map__svg--live" aria-hidden="true" focusable="false"><g class="map__done" data-map-done></g><circle class="map__head" data-map-head r="5" cx="-20" cy="-20"/></svg>
+        <ol class="map__stops">
+          <li class="map__stop" style="--col: 2 / span 4" data-map-stop>
+            <p class="map__node"><i></i><span class="map__city">Сиань · площадка</span><span class="map__geo">34.34° N 108.94° E</span></p>
+            <article class="doc doc--photo">
+              <header class="doc__top"><span class="doc__no">Отчёт № VD-0412</span><span class="doc__state" data-wait="ожидается" data-done="готов"></span></header>
+              <p class="doc__day">День 5–15</p>
+              <h3>Фотоотчёт и выкуп</h3>
+              <div class="doc__shots" data-report role="group" aria-label="Кадры фотоотчёта: рендер выбранной модели">
+                <figure class="doc__shot doc__shot--main"><img data-report-shot="1" src="img/report/zeekr-7x-1.webp" width="640" height="480" alt="" loading="lazy"><span class="doc__count">01 / 112</span><figcaption>Анфас</figcaption></figure>
+                <figure class="doc__shot"><img data-report-shot="2" src="img/report/zeekr-7x-2.webp" width="320" height="240" alt="" loading="lazy"><figcaption>Колесо</figcaption></figure>
+                <figure class="doc__shot"><img data-report-shot="3" src="img/report/zeekr-7x-3.webp" width="320" height="240" alt="" loading="lazy"><figcaption>Фара</figcaption></figure>
+                <figure class="doc__shot"><img data-report-shot="4" src="img/report/zeekr-7x-4.webp" width="320" height="240" alt="" loading="lazy"><figcaption>Корма</figcaption></figure>
+                <figure class="doc__shot"><img data-report-shot="5" src="img/report/zeekr-7x-5.webp" width="320" height="240" alt="" loading="lazy"><span class="doc__more">+107</span><figcaption>Профиль</figcaption></figure>
+              </div>
+              <p class="doc__vin"><span>VIN</span><span class="doc__code">L••••••••••••0412</span><b>сверен</b></p>
+              <p>Больше 100 фото и видео, сверка VIN и комплектации. Платите за машину, которую видели.</p>
+              <p class="doc__small">Кадры&nbsp;— рендер выбранной модели, не фото настоящей машины.</p>
+            </article>
+          </li>
+          <li class="map__stop" style="--col: 8 / span 4" data-map-stop>
+            <p class="map__node"><i></i><span class="map__city">Сиань · ж/д-терминал</span><span class="map__geo">34.27° N 109.06° E</span></p>
+            <article class="doc doc--rail">
+              <header class="doc__top"><span class="doc__no">Накладная СМГС № 26-04812</span><span class="doc__state" data-wait="ожидается" data-done="выдана"></span></header>
+              <p class="doc__day">День 15–22</p>
+              <h3>Ж/д-накладная</h3>
+              <p class="doc__leg"><span>Сиань</span><i aria-hidden="true"></i><span>Минск</span></p>
+              <dl class="doc__rows"><div><dt>Груз</dt><dd>Контейнер до Минска</dd></div><div><dt>Контейнер</dt><dd>VDRU 041226 3</dd></div><div><dt>Страховка в пути</dt><dd>Включена</dd></div><div><dt>Доставка</dt><dd>$2 800</dd></div></dl>
+              <footer class="doc__stub"><span class="doc__bars" aria-hidden="true"></span><span>Пломба № 0412886</span></footer>
+            </article>
+          </li>
+          <li class="map__stop map__stop--small" style="--col: 4 / span 3" data-map-stop>
+            <p class="map__node"><i></i><span class="map__city">Хоргос · граница</span><span class="map__geo">44.21° N 80.41° E</span></p>
+            <article class="doc doc--transit">
+              <header class="doc__top"><span class="doc__no">Маршрут · 4 страны</span><span class="doc__state" data-wait="ожидается" data-done="в пути"></span></header>
+              <p class="doc__day">День 22–50</p>
+              <h3>Транзит</h3>
+              <ol class="doc__legs"><li>Китай</li><li>Казахстан</li><li>Россия</li><li>Беларусь</li></ol>
+              <p>Казахстан и Россия по железной дороге&nbsp;— 25–28 дней.</p>
+            </article>
+          </li>
+          <li class="map__stop" style="--col: 7 / span 5" data-map-stop>
+            <p class="map__node"><i></i><span class="map__city">Минск · таможня</span><span class="map__geo">53.90° N 27.56° E</span></p>
+            <article class="doc doc--customs">
+              <header class="doc__top"><span class="doc__no">Декларация № 0412-26</span><span class="doc__state" data-wait="ожидается" data-done="выпуск"></span></header>
+              <p class="doc__day">День 50–55</p>
+              <h3>Таможенная декларация</h3>
+              <dl class="doc__rows"><div><dt>Модель</dt><dd data-map-model>Zeekr 7X</dd></div><div><dt data-map-duty-label>Пошлина 15% сверх квоты</dt><dd data-map-duty>14 348 BYN</dd></div><div><dt>Утильсбор, сбор, СВХ, ЭПТС</dt><dd data-map-fees>1 195 BYN</dd></div></dl>
+              <p class="doc__small">Суммы&nbsp;— из вашего расчёта, ориентировочно.</p>
+              <svg class="doc__seal" viewBox="0 0 120 120" aria-hidden="true" focusable="false"><defs><path id="seal-ring" d="M60 60 m-44 0 a44 44 0 1 1 88 0 a44 44 0 1 1 -88 0"/></defs><circle cx="60" cy="60" r="56"/><circle cx="60" cy="60" r="34"/><text><textPath href="#seal-ring">выпуск разрешён · выпуск разрешён ·</textPath></text><text class="doc__seal-mid" x="60" y="66">0412</text></svg>
+            </article>
+          </li>
+          <li class="map__stop" style="--col: 2 / span 4" data-map-stop>
+            <p class="map__node"><i></i><span class="map__city">Минск · выдача</span><span class="map__geo">53.90° N 27.56° E</span></p>
+            <article class="doc doc--keys">
+              <header class="doc__top"><span class="doc__no">ЭПТС № 1121 •••• 0412</span><span class="doc__state" data-wait="ожидается" data-done="оформлен"></span></header>
+              <p class="doc__day">День 55–60</p>
+              <h3>ЭПТС и ключи</h3>
+              <div class="doc__pass">
+                <svg class="doc__qr" viewBox="-1 -1 23 23" aria-hidden="true" focusable="false"><path d="M0 0h1v1h-1zM1 0h1v1h-1zM2 0h1v1h-1zM3 0h1v1h-1zM4 0h1v1h-1zM5 0h1v1h-1zM6 0h1v1h-1zM8 0h1v1h-1zM9 0h1v1h-1zM10 0h1v1h-1zM14 0h1v1h-1zM15 0h1v1h-1zM16 0h1v1h-1zM17 0h1v1h-1zM18 0h1v1h-1zM19 0h1v1h-1zM20 0h1v1h-1zM0 1h1v1h-1zM6 1h1v1h-1zM8 1h1v1h-1zM9 1h1v1h-1zM12 1h1v1h-1zM14 1h1v1h-1zM20 1h1v1h-1zM0 2h1v1h-1zM2 2h1v1h-1zM3 2h1v1h-1zM4 2h1v1h-1zM6 2h1v1h-1zM8 2h1v1h-1zM10 2h1v1h-1zM11 2h1v1h-1zM12 2h1v1h-1zM14 2h1v1h-1zM16 2h1v1h-1zM17 2h1v1h-1zM18 2h1v1h-1zM20 2h1v1h-1zM0 3h1v1h-1zM2 3h1v1h-1zM3 3h1v1h-1zM4 3h1v1h-1zM6 3h1v1h-1zM8 3h1v1h-1zM10 3h1v1h-1zM14 3h1v1h-1zM16 3h1v1h-1zM17 3h1v1h-1zM18 3h1v1h-1zM20 3h1v1h-1zM0 4h1v1h-1zM2 4h1v1h-1zM3 4h1v1h-1zM4 4h1v1h-1zM6 4h1v1h-1zM8 4h1v1h-1zM11 4h1v1h-1zM14 4h1v1h-1zM16 4h1v1h-1zM17 4h1v1h-1zM18 4h1v1h-1zM20 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM10 5h1v1h-1zM11 5h1v1h-1zM14 5h1v1h-1zM20 5h1v1h-1zM0 6h1v1h-1zM1 6h1v1h-1zM2 6h1v1h-1zM3 6h1v1h-1zM4 6h1v1h-1zM5 6h1v1h-1zM6 6h1v1h-1zM8 6h1v1h-1zM9 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM15 6h1v1h-1zM16 6h1v1h-1zM17 6h1v1h-1zM18 6h1v1h-1zM19 6h1v1h-1zM20 6h1v1h-1zM8 7h1v1h-1zM11 7h1v1h-1zM3 8h1v1h-1zM4 8h1v1h-1zM6 8h1v1h-1zM8 8h1v1h-1zM13 8h1v1h-1zM14 8h1v1h-1zM16 8h1v1h-1zM2 9h1v1h-1zM6 9h1v1h-1zM7 9h1v1h-1zM8 9h1v1h-1zM9 9h1v1h-1zM10 9h1v1h-1zM11 9h1v1h-1zM13 9h1v1h-1zM14 9h1v1h-1zM18 9h1v1h-1zM19 9h1v1h-1zM3 10h1v1h-1zM4 10h1v1h-1zM7 10h1v1h-1zM8 10h1v1h-1zM9 10h1v1h-1zM11 10h1v1h-1zM17 10h1v1h-1zM18 10h1v1h-1zM20 10h1v1h-1zM0 11h1v1h-1zM1 11h1v1h-1zM5 11h1v1h-1zM6 11h1v1h-1zM8 11h1v1h-1zM11 11h1v1h-1zM15 11h1v1h-1zM18 11h1v1h-1zM19 11h1v1h-1zM0 12h1v1h-1zM1 12h1v1h-1zM2 12h1v1h-1zM6 12h1v1h-1zM15 12h1v1h-1zM16 12h1v1h-1zM18 12h1v1h-1zM19 12h1v1h-1zM20 12h1v1h-1zM8 13h1v1h-1zM9 13h1v1h-1zM12 13h1v1h-1zM13 13h1v1h-1zM16 13h1v1h-1zM18 13h1v1h-1zM19 13h1v1h-1zM20 13h1v1h-1zM0 14h1v1h-1zM1 14h1v1h-1zM2 14h1v1h-1zM3 14h1v1h-1zM4 14h1v1h-1zM5 14h1v1h-1zM6 14h1v1h-1zM8 14h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM12 14h1v1h-1zM18 14h1v1h-1zM19 14h1v1h-1zM20 14h1v1h-1zM0 15h1v1h-1zM6 15h1v1h-1zM11 15h1v1h-1zM13 15h1v1h-1zM17 15h1v1h-1zM18 15h1v1h-1zM19 15h1v1h-1zM0 16h1v1h-1zM2 16h1v1h-1zM3 16h1v1h-1zM4 16h1v1h-1zM6 16h1v1h-1zM8 16h1v1h-1zM11 16h1v1h-1zM12 16h1v1h-1zM14 16h1v1h-1zM15 16h1v1h-1zM16 16h1v1h-1zM18 16h1v1h-1zM19 16h1v1h-1zM0 17h1v1h-1zM2 17h1v1h-1zM3 17h1v1h-1zM4 17h1v1h-1zM6 17h1v1h-1zM9 17h1v1h-1zM12 17h1v1h-1zM14 17h1v1h-1zM16 17h1v1h-1zM17 17h1v1h-1zM0 18h1v1h-1zM2 18h1v1h-1zM3 18h1v1h-1zM4 18h1v1h-1zM6 18h1v1h-1zM9 18h1v1h-1zM10 18h1v1h-1zM12 18h1v1h-1zM15 18h1v1h-1zM18 18h1v1h-1zM19 18h1v1h-1zM0 19h1v1h-1zM6 19h1v1h-1zM10 19h1v1h-1zM11 19h1v1h-1zM12 19h1v1h-1zM13 19h1v1h-1zM17 19h1v1h-1zM18 19h1v1h-1zM0 20h1v1h-1zM1 20h1v1h-1zM2 20h1v1h-1zM3 20h1v1h-1zM4 20h1v1h-1zM5 20h1v1h-1zM6 20h1v1h-1zM10 20h1v1h-1zM11 20h1v1h-1zM12 20h1v1h-1zM13 20h1v1h-1zM15 20h1v1h-1zM16 20h1v1h-1zM17 20h1v1h-1zM19 20h1v1h-1z"/></svg>
+                <dl class="doc__rows"><div><dt>Статус</dt><dd>Действующий</dd></div><div><dt>Собственник</dt><dd>Вы</dd></div><div><dt>Ключи</dt><dd><svg class="doc__key" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="7.5" cy="12" r="4"/><path d="M11.5 12H21v3M17.5 12v2.5"/></svg> 2 шт.</dd></div></dl>
+              </div>
+              <p>Электронный паспорт оформлен&nbsp;— забираете ключи в Минске.</p>
+            </article>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Путь 45–60 дней: машина едет по маршруту. К 78 % прокрутки блока (data-route-arrive) она у Минска, стоит,
+       потом уезжает за правый край кадра (правка 2026-10-04: край блока «Оплата» некрасиво обрезал машину). Пока «Оплата»
+       наезжает снизу, холст гаснет, машина встаёт на своё место в «Оплате» и проявляется силуэтом. -->
+  <section class="route" id="route" data-route data-route-arrive="0.78"
+    data-scene='{"az":-90,"el":3,"fit":0.3,"shiftX":0,"shiftY":0.2,"lookY":0.5,"dim":1,"route":0,"amb":0,"sil":0,"lights":0,"bg":"#0b0e16",
+      "speed":0,"close":1,"lookX":0,"lookZ":0,"cool":0,"pool":1,"skyK":1,"sky1":"#2a3350","sky2":"#0b0e16","ignite":0,"carZ":0,"cT":0,"cR":0,"cB":0,"cL":0,"cRad":0,
+      "phone":{"fit":0.6,"shiftY":0.02}}'
+    data-scene-end='{"az":-90,"el":3,"fit":0.3,"shiftX":0,"shiftY":0.2,"lookY":0.5,"dim":1,"route":2.2,"amb":0,"sil":0,"lights":0,"bg":"#0b0e16",
+      "phone":{"fit":0.6,"shiftY":0.02}}'>
+    <span class="scene-key" style="top:calc((100% - 100vh) * .78)" data-scene='{"route":1}'></span>
+    <span class="scene-key" style="top:calc((100% - 100vh) * .86)" data-scene='{"route":1}'></span>
+    <span class="scene-key" style="top:calc(100% - 100vh + 32vh)" data-scene='{"route":2.2,"dim":0}'></span>
+    <span class="scene-key" style="top:calc(100% - 100vh + 58vh)" data-scene='{"dim":0,"az":-28,"el":6,"fit":0.42,"fitH":0.5,"shiftX":0.25,"shiftY":0.12,"lookY":0.45,"sil":1,"amb":0.5,"bg":"#0b0e16",
+      "phone":{"fit":0.62,"fitH":0.3,"shiftX":0,"shiftY":-0.3}}'></span>
+    <div class="route__stage" data-route-stage>
+      <div class="route__head">
+        <h2 class="display" data-scramble>45–60 дней <span class="accent">от оплаты до ключей</span></h2>
+        <div class="route__day">
+          <p class="route__day-label">День пути</p>
+          <p class="num" data-route-day>60</p>
+          <!-- текущий этап меняется за прокруткой (правка 2026-10-04: «День пути 0» стоял на месте) -->
+          <p class="route__now" data-route-now aria-live="polite"><span data-route-now-n>Этап 6 из 6</span><b data-route-now-b>Ключи и ЭПТС</b><span data-route-now-s>2–5 дней</span></p>
+          <p class="route__via">Китай&nbsp;— Казахстан&nbsp;— Россия&nbsp;— Минск</p>
+        </div>
+      </div>
+      <div class="route__line" data-route-line>
+        <ol class="route__stops">
+          <li data-stop="5"><b>Подбор и договор</b><span>3–5 дней</span></li>
+          <li data-stop="15"><b>Проверка и выкуп</b><span>7–10 дней, 100+ фото, VIN</span></li>
+          <li data-stop="22"><b>Погрузка в Китае</b><span>5–7 дней</span></li>
+          <li data-stop="50"><b>Ж/д через Казахстан и Россию</b><span>25–28 дней</span></li>
+          <li data-stop="55"><b>Таможня в Минске</b><span>3–5 дней</span></li>
+          <li data-stop="60"><b>Ключи и ЭПТС</b><span>2–5 дней</span></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. Оплата в 3 этапа: стопка карточек слева, справа — та же 3D-машина меняется вместе с этапом (правка 2026-10-04:
+       блок был «скучноват»): депозит — силуэт в темноте (машину ещё ищут), оплата машины — вспышки фотоотчёта и рамка
+       видоискателя, Минск — фары «зажигаются». Стопка: за прокруткой следующий этап наезжает на предыдущий, «Оплачено» растёт
+       (прежняя шкала с едущей машиной повторяла «Путь»). Суммы — из расчёта (calc:update). Ракурсы — data-scene и метки
+       .scene-key (доли прокрутки закреплённого блока). Без JS и на низком телефоне — три карточки списком. -->
+  <section class="pay" id="pay" data-pay
+    data-scene='{"dim":1,"az":-28,"el":6,"fit":0.42,"fitH":0.5,"shiftX":0.25,"shiftY":0.12,"lookY":0.45,"sil":1,"lights":0,"amb":0.5,"pool":0.8,"cool":0,"bg":"#0b0e16","skyK":1,"sky1":"#2a3350","sky2":"#0b0e16",
+      "phone":{"fit":0.62,"fitH":0.3,"shiftX":0,"shiftY":-0.3}}'
+    data-scene-end='{"sil":0,"az":-22,"el":5,"lights":1}'>
+    <span class="scene-key" style="top:calc((100% - 100vh) * .2)" data-scene='{"sil":1,"az":-30,"el":6,"lights":0}'></span>
+    <span class="scene-key" style="top:calc((100% - 100vh) * .42)" data-scene='{"sil":0.06,"az":-58,"el":8,"lights":0}'></span>
+    <span class="scene-key" style="top:calc((100% - 100vh) * .64)" data-scene='{"sil":0,"az":-72,"el":7,"lights":0}'></span>
+    <span class="scene-key" style="top:calc((100% - 100vh) * .72)" data-scene='{"sil":0,"az":-60,"el":6,"lights":1}'></span>
+    <span class="scene-key" style="top:calc((100% - 100vh) * .86)" data-scene='{"sil":0,"az":-22,"el":5,"lights":1}'></span>
+    <div class="pay__stage">
+      <div class="pay__head">
+        <h2 class="display">Оплата <span class="accent">в&nbsp;три этапа</span></h2>
+        <p class="lead">Платите за то, что уже сделано: деньги за машину&nbsp;— только после фотоотчёта, за доставку и таможню&nbsp;— когда она в Минске. Всё в BYN по курсу Нацбанка на день платежа.</p>
+      </div>
+      <div class="pay__paid">
+        <p class="pay__paid-label">Оплачено после этапа <span data-pay-n>3</span> из 3</p>
+        <p class="num" data-pay-sum>121 079 BYN</p>
+        <div class="pay__bar" aria-hidden="true"><i data-pay-seg style="--share:0.83"><b></b></i><i data-pay-seg style="--share:78.99"><b></b></i><i data-pay-seg style="--share:20.18"><b></b></i></div>
+        <p class="pay__paid-of">из <span data-pay-total>121 079</span> BYN под ключ · пример: <span data-pay-model>Zeekr 7X</span></p>
+      </div>
+      <ol class="pay__stack">
+        <li class="pay__card" data-pay-step>
+          <div class="pay__main">
+            <p class="pay__when"><b>Этап 1</b><span>день 1–5 · договор</span></p>
+            <p class="num" data-pay-amount>1 000 BYN</p>
+            <p class="pay__what">Депозит при подписании договора. Засчитываем в итог; возвращаем, если не нашли машину под ваш запрос.</p>
+          </div>
+          <div class="pay__proof">
+            <p>До платежа у вас уже есть</p>
+            <ul><li>Расчёт под ключ по строкам</li><li>Проверка, что модель выпускают на экспорт</li></ul>
+          </div>
+        </li>
+        <li class="pay__card" data-pay-step>
+          <div class="pay__main">
+            <p class="pay__when"><b>Этап 2</b><span>день 10–15 · машина в Китае</span></p>
+            <p class="num" data-pay-amount>95 638 BYN</p>
+            <p class="pay__what">100% цены машины в Китае&nbsp;— только после того, как вы увидели её на площадке.</p>
+          </div>
+          <div class="pay__proof">
+            <p>До платежа у вас уже есть</p>
+            <ul><li>Больше 100 фото и видео с площадки</li><li>Сверка VIN и комплектации</li></ul>
+          </div>
+        </li>
+        <li class="pay__card" data-pay-step>
+          <div class="pay__main">
+            <p class="pay__when"><b>Этап 3</b><span>день 40–55 · Минск</span></p>
+            <p class="num" data-pay-amount>24 441 BYN</p>
+            <p class="pay__what">Доставка $2 800, пошлина и сборы, услуга 1 500 BYN&nbsp;— за вычетом депозита.</p>
+          </div>
+          <div class="pay__proof">
+            <p>До платежа у вас уже есть</p>
+            <ul><li>Машина в Минске</li><li>Пошлина и сборы&nbsp;— по ставкам из расчёта</li></ul>
+          </div>
+        </li>
+      </ol>
+      <!-- рамка видоискателя над машиной и подпись этапа (home.js: data-stage у секции) -->
+      <div class="pay__view" aria-hidden="true">
+        <span class="pay__corners"><i></i><i></i><i></i><i></i></span>
+        <p class="pay__tag"><b data-pay-tag-n>Этап 1</b><span data-pay-tag>Ищем машину под ваш запрос&nbsp;— пока виден только силуэт</span></p>
+      </div>
+      <p class="small pay__note">Суммы&nbsp;— пример для модели из расчёта выше; цены условные.</p>
+    </div>
+  </section>
+
+  <!-- 9. Что не привезём: горизонтальная лента — блок закрепляется, карточки едут вбок за прокруткой, выделена текущая
+       (правка 2026-10-04: был «скучный» список с крестиками). Слайдер (правка 2026-10-06, адаптив 1240): стрелки у полосы
+       прогресса листают по карточке, мышью ленту можно тянуть, карточка под курсором темнеет. Без JS — лента листается пальцем. -->
+  <section class="cant theme-paper" id="cant" data-cant data-scene='{"dim":0}'>
+    <div class="cant__stage">
+      <div class="cant__head">
+        <h2 class="display">Что мы <span class="accent">не привезём</span></h2>
+        <p class="lead">Говорим «нет» до договора, а не после оплаты.</p>
+        <p class="cant__count" aria-hidden="true"><span data-cant-n>01</span> / 05</p>
+      </div>
+      <div class="cant__viewport">
+        <ol class="cant__track" data-cant-track>
+          <li class="cant__card"><span class="cant__num" aria-hidden="true">01</span><svg class="cant__x" viewBox="0 0 40 40" aria-hidden="true"><path pathLength="1" d="M6 6 34 34"/><path pathLength="1" d="M34 6 6 34"/></svg><h3>Модель не&nbsp;на&nbsp;экспорт</h3><p>Не каждую машину можно вывезти из Китая&nbsp;— проверяем до договора.</p></li>
+          <li class="cant__card"><span class="cant__num" aria-hidden="true">02</span><svg class="cant__x" viewBox="0 0 40 40" aria-hidden="true"><path pathLength="1" d="M6 6 34 34"/><path pathLength="1" d="M34 6 6 34"/></svg><h3>Машину без истории</h3><p>Только с VIN, экспортными документами и осмотром на площадке.</p></li>
+          <li class="cant__card"><span class="cant__num" aria-hidden="true">03</span><svg class="cant__x" viewBox="0 0 40 40" aria-hidden="true"><path pathLength="1" d="M6 6 34 34"/><path pathLength="1" d="M34 6 6 34"/></svg><h3>Гибрид по&nbsp;льготе</h3><p>Льгота&nbsp;— только для электромобилей. Гибрид считаем по объёму двигателя.</p></li>
+          <li class="cant__card"><span class="cant__num" aria-hidden="true">04</span><svg class="cant__x" viewBox="0 0 40 40" aria-hidden="true"><path pathLength="1" d="M6 6 34 34"/><path pathLength="1" d="M34 6 6 34"/></svg><h3>Льготную машину на&nbsp;перепродажу</h3><p>Условие квоты: такую машину нельзя передавать гражданам и жителям России и Казахстана.</p></li>
+          <li class="cant__card"><span class="cant__num" aria-hidden="true">05</span><svg class="cant__x" viewBox="0 0 40 40" aria-hidden="true"><path pathLength="1" d="M6 6 34 34"/><path pathLength="1" d="M34 6 6 34"/></svg><h3>«Под ключ за три недели»</h3><p>Честный срок&nbsp;— 45–60 дней от оплаты до ключей.</p></li>
+        </ol>
+      </div>
+      <div class="cant__foot">
+        <div class="cant__progress" aria-hidden="true"><i></i></div>
+        <button class="cant__arrow" type="button" data-cant-step="-1" aria-label="Предыдущая карточка"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4 6.5 10l6 6"/></svg></button>
+        <button class="cant__arrow" type="button" data-cant-step="1" aria-label="Следующая карточка"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7.5 4l6 6-6 6"/></svg></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. Цифры и отзывы. В углу карточки — фото модели из отзыва (правка 2026-10-04): Wikimedia Commons, без людей,
+       значки марок и номера размыты (materials/media/reviews: SOURCES.md, prepare.cjs). По нажатию фото открывается
+       на весь экран (правка 2026-10-05, home.js); без JS ссылка открывает сам файл фото. -->
+  <section class="section section--solid trust" id="reviews" data-scene='{"dim":0}'>
+    <div class="inner">
+      <div class="facts">
+        <div><div class="num" data-scramble>2021</div><p>работаем с этого года</p></div>
+        <div><div class="num" data-scramble>412<small>машин</small></div><p>привезли в Беларусь</p></div>
+        <div><div class="num" data-scramble>45–60<small>дней</small></div><p>от оплаты до ключей</p></div>
+      </div>
+      <ul class="reviews">
+        <li><blockquote>«Считали Zeekr 7X: итог совпал с расчётом, разница&nbsp;— только в курсе на день оплаты. Машина пришла на 52-й день.»</blockquote><footer><b>Андрей К., Минск</b>Zeekr 7X</footer><a class="reviews__zoom" href="img/review-zeekr-7x-1600.webp" data-lightbox data-caption="Zeekr 7X" aria-label="Открыть фото Zeekr 7X на весь экран"><img class="reviews__car" src="img/review-zeekr-7x-480.webp" srcset="img/review-zeekr-7x-480.webp 480w, img/review-zeekr-7x-960.webp 960w" sizes="(max-width: 1100px) 48vw, 220px" width="480" height="320" alt="Zeekr 7X — фото модели из открытых источников, не машина клиента" loading="lazy"></a></li>
+        <li><blockquote>«Боялась покупать вслепую. Прислали 140 фото и видео с площадки, отдельно сняли VIN и запаску. Оплатила только после этого.»</blockquote><footer><b>Ольга С., Гродно</b>Li Auto L6</footer><a class="reviews__zoom" href="img/review-li-l6-1600.webp" data-lightbox data-caption="Li Auto L6" aria-label="Открыть фото Li Auto L6 на весь экран"><img class="reviews__car" src="img/review-li-l6-480.webp" srcset="img/review-li-l6-480.webp 480w, img/review-li-l6-960.webp 960w" sizes="(max-width: 1100px) 48vw, 220px" width="480" height="320" alt="Li Auto L6 — фото модели из открытых источников, не машина клиента" loading="lazy"></a></li>
+        <li><blockquote>«Хотел гибрид по льготе&nbsp;— объяснили, что льгота только для электромобилей, и посчитали оба варианта. Взял Monjaro, без сюрпризов на таможне.»</blockquote><footer><b>Дмитрий П., Брест</b>Geely Monjaro</footer><a class="reviews__zoom" href="img/review-monjaro-1178.webp" data-lightbox data-caption="Geely Monjaro" aria-label="Открыть фото Geely Monjaro на весь экран"><img class="reviews__car" src="img/review-monjaro-480.webp" srcset="img/review-monjaro-480.webp 480w, img/review-monjaro-960.webp 960w" sizes="(max-width: 1100px) 48vw, 220px" width="480" height="320" alt="Geely Monjaro — фото модели из открытых источников, не машина клиента" loading="lazy"></a></li>
+      </ul>
+      <!-- слайдер отзывов на экране до 1100px (правка 2026-10-07, адаптив 1100): стрелки, счётчик и полоса — home.js -->
+      <div class="reviews__foot">
+        <p class="reviews__count" aria-live="polite"><span data-rev-n>01</span> / 03</p>
+        <div class="cant__progress" aria-hidden="true"><i></i></div>
+        <button class="cant__arrow" type="button" data-rev-step="-1" aria-label="Предыдущий отзыв"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4 6.5 10l6 6"/></svg></button>
+        <button class="cant__arrow" type="button" data-rev-step="1" aria-label="Следующий отзыв"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7.5 4l6 6-6 6"/></svg></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11. Вопросы -->
+  <section class="section section--alt faq theme-paper" id="faq" data-scene='{"dim":0}'>
+    <div class="inner">
+      <div class="faq__head">
+        <h2 class="display">Частые <span class="accent">вопросы</span></h2>
+        <p class="lead">Не нашли ответ&nbsp;— оставьте заявку, ответим на расчёте.</p>
+      </div>
+      <div>
+        <details><summary>Сколько ждать машину?</summary><p>45–60 дней от оплаты до ключей в Минске: 3–5 дней на подбор и договор, 7–10&nbsp;— проверка и выкуп, 5–7&nbsp;— погрузка, 25–28&nbsp;— железная дорога через Казахстан и Россию, остальное&nbsp;— таможня и выдача.</p></details>
+        <details><summary>Из чего складывается цена?</summary><p>Цена машины в Китае, доставка $2 800 до Минска, пошлина по ставкам РБ, утильсбор и сборы, фиксированная услуга 1 500 BYN. Все строки&nbsp;— в калькуляторе выше.</p></details>
+        <details><summary>Что с гарантией?</summary><p>Заводская гарантия на машину для китайского рынка действует в Китае. В Минске подскажем сервис, который работает с маркой, и передадим документы и фотоотчёт.</p></details>
+        <details><summary>Будет ли русский язык в машине?</summary><p>У многих моделей для Китая меню только на китайском и английском. Проверяем русификацию до покупки и заранее говорим, если её нет.</p></details>
+        <details><summary>Как заряжать электромобиль?</summary><p>Китайские машины используют разъём GB/T. До покупки проверим, какие станции и домашняя зарядка вам подойдут, и при необходимости подберём переходник.</p></details>
+        <details><summary>Машина застрахована в пути?</summary><p>Да, страховка груза включена в стоимость доставки $2 800.</p></details>
+        <details><summary>В какой валюте платить?</summary><p>В белорусских рублях по курсу Нацбанка на день платежа, в три этапа.</p></details>
+        <details><summary>Есть ли льгота на электромобили?</summary><p>Есть квота 2026 года: в её пределах физлицо не платит пошлину. Сверх квоты&nbsp;— 15%. Гибридам льгота не положена. Остаток квоты проверяем перед договором.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12. Заявка: машина приехала — крупно, вполоборота, фары «зажигаются», пока посетитель здесь — моргают (правка 2026-10-04) -->
+  <section class="section contact" id="contacts"
+    data-scene='{"az":16,"el":6,"fit":0.5,"fitH":0.74,"shiftX":0.23,"shiftY":0.05,"lookY":0.45,"dim":1,"lights":1,"amb":1,"ignite":1,"sil":0,"speed":0,"skyK":1,"sky1":"#2a3350","sky2":"#0b0e16",
+      "phone":{"az":12,"el":7,"fit":0.95,"fitH":0.46,"shiftX":0,"shiftY":-0.22},
+      "at":[[1279,{"shiftX":0.27}]]}'>
+    <img class="poster" src="img/car-front-1600.webp" srcset="img/car-front-800.webp 800w, img/car-front-1600.webp 1600w" sizes="(max-width: 900px) 100vw, 640px" width="1600" height="900" alt="Zeekr 7X анфас с включёнными фарами" loading="lazy">
+    <div class="inner">
+      <div class="contact__col">
+        <h2 class="display">Посчитаем <span class="accent">вашу машину</span></h2>
+        <p class="lead">Напишите модель или бюджет&nbsp;— пришлём расчёт под ключ по строкам и проверим, есть ли машина на площадках.</p>
+        <form class="form" data-form="demo" method="post" id="lead-form">
+          <label>Имя <input name="name" autocomplete="name" required></label>
+          <label>Телефон <input name="phone" type="tel" autocomplete="tel" required></label>
+          <label>Машина или бюджет <input name="car" autocomplete="off" placeholder="Например, Zeekr 7X или до 120 000 BYN"></label>
+          <label class="form__consent"><input type="checkbox" name="consent" required> <span>Даю <a href="legal/consent.html">согласие на обработку персональных данных</a> и ознакомлен(а) с <a href="legal/privacy.html">политикой конфиденциальности</a></span></label>
+          <p class="form__note">Как мы обрабатываем данные&nbsp;— <a href="legal/privacy.html">политика обработки персональных данных</a>.</p>
+          <button class="button button--arrow" type="submit" disabled><span>Отправить заявку</span><i aria-hidden="true">↘</i></button>
+          <p data-form-status role="status"></p>
+        </form>
+        <div class="contact__links">
+          <span>+375 00 000-00-00</span><span>info@example.com</span><span>Минск</span>
+          <div class="chips"><a href="#lead-form">Telegram</a><a href="#lead-form">Viber</a><a href="#lead-form">WhatsApp</a><a href="#lead-form">Instagram</a></div>
+          <span class="small">Контакты и мессенджеры условные&nbsp;— оставьте заявку в форме.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- фото из отзыва на весь экран (home.js): вырастает из карточки, закрывается нажатием, крестиком или Esc -->
+  <dialog class="lightbox" data-lightbox-dialog aria-label="Фото машины">
+    <div class="lightbox__bg" aria-hidden="true"></div>
+    <figure class="lightbox__fig"><img class="lightbox__img" width="1600" height="1067" alt=""><figcaption class="lightbox__cap"></figcaption></figure>
+    <button class="lightbox__close" type="button" aria-label="Закрыть фото"></button>
+  </dialog>
+</main>
+
+<div data-include="footer"><p>© 2026 Восток Драйв</p></div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/header.js"></script>
+<script src="assets/js/header-stick.js"></script>
+<script src="assets/js/footer.js"></script>
+<script src="assets/js/contacts.js"></script>
+<script src="assets/js/form-demo.js"></script>
+<script src="assets/js/models-data.js"></script>
+<script src="assets/js/brief.js"></script>
+<script src="assets/js/scramble.js"></script>
+<script src="assets/js/home.js"></script>
+<script src="assets/vendor/three/three-bundle.js"></script>
+<script src="assets/models/zeekr-7x.js"></script>
+<script src="assets/js/showroom.js"></script>
+<script src="assets/js/scenes.js"></script>
+<script src="assets/js/calc.js"></script>
+<script src="assets/vendor/lenis/lenis.min.js"></script>
+<script src="assets/js/smooth.js"></script>
+</body>
+</html>

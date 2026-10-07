@@ -1,0 +1,614 @@
+/* Главная «Восток Драйв». Значения — из tokens.css, композиция — DESIGN.md. */
+:root { --color-bg-alt: #0e1220; }
+body { background: var(--color-bg); }
+main { position: relative; z-index: 1; }
+
+/* Шапка поверх первого экрана (высота шапки 72px + линия) */
+main > .hero:first-child { margin-top: -73px; }
+@media (max-width: 900px) { main > .hero:first-child { margin-top: -61px; } }
+
+/* ---------- 3D-холст за страницей ---------- */
+.showroom { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0; }
+/* фон за холстом по блокам (showroom.js): свой закреплённый слой — смена цвета не перерисовывает всю страницу */
+.showroom-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.has-webgl .showroom { opacity: 1; }
+.poster { display: none; }
+.no-webgl .poster, html:not(.js) .poster { display: block; }   /* без WebGL и без JS — собственный рендер машины */
+/* края рендера гаснут в фон: у картинки свой, чуть другой тёмный фон — иначе виден прямоугольник */
+.poster { -webkit-mask-image: radial-gradient(closest-side, #000 62%, transparent); mask-image: radial-gradient(closest-side, #000 62%, transparent); }
+/* без JS переключатель цвета и подпись плана монтажа не работают — не показываем */
+html:not(.js) .paint, html:not(.js) .hero__shot { display: none; }
+
+/* ---------- общие элементы ---------- */
+.section { position: relative; padding: var(--space-section) var(--gutter); }
+.section--alt { background: var(--color-bg-alt); }
+.section--solid { background: var(--color-bg); }
+.inner { max-width: var(--container); margin: 0 auto; }
+.display { font-family: var(--font-heading); font-stretch: var(--font-stretch-display); font-weight: 800; text-transform: uppercase; }
+h2.display { font-size: var(--text-h2); line-height: .95; letter-spacing: -.02em; margin: 0; }
+.display .accent, .accent { color: var(--color-accent); }
+.lead { margin: 0; color: var(--color-muted); font-size: var(--text-base); line-height: 1.55; max-width: 46ch; }
+.lead b, .lead strong { color: var(--color-text); font-weight: 500; }
+.small { font-size: 13px; color: var(--color-muted); line-height: 1.45; }
+.head { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: var(--space-3) var(--space-5); align-items: end; margin-bottom: var(--space-5); }
+.num { font-family: var(--font-heading); font-stretch: var(--font-stretch-display); font-weight: 700; letter-spacing: -.02em; white-space: nowrap; line-height: 1; }
+.num small { font-size: .38em; letter-spacing: 0; margin-left: .2em; }
+
+/* «Сборка» букв: настоящая буква в потоке, случайный символ поверх — ширина не прыгает */
+.sc { position: relative; transition: color .35s var(--ease); }
+.sc::after { content: attr(data-g); position: absolute; left: 0; top: 0; color: var(--color-accent); opacity: 0; transition: opacity .35s var(--ease); pointer-events: none; }
+.sc.is-scr { color: transparent; }
+.sc.is-scr::after { opacity: 1; }
+
+/* ---------- 1. Первый экран: прелоадер → окно с монтажом планов машины (правка 2026-10-04) ---------- */
+.hero { position: relative; min-height: 100svh; padding: 0 var(--gutter); overflow: hidden; }
+/* затемнение сверху и снизу: заголовок и панель читаются поверх любого плана монтажа */
+/* низ — по S-кривой до 0,86 с нулевым наклоном у края, «Почему из Китая» (::after) продолжает так же (на стыке прямых
+   градиентов был излом); --shade (home.js) гасит низ с началом прокрутки — иначе затемнение ехало вверх поверх
+   неподвижной 3D-сцены тёмной полосой между блоками (правка 2026-10-07, адаптив 1366) */
+.hero::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgb(11 14 22 / .72), rgb(11 14 22 / 0) 36%, rgb(11 14 22 / 0) 58%, rgb(11 14 22 / calc(.037 * var(--shade, 1))) 63.25%, rgb(11 14 22 / calc(.134 * var(--shade, 1))) 68.5%, rgb(11 14 22 / calc(.272 * var(--shade, 1))) 73.75%, rgb(11 14 22 / calc(.43 * var(--shade, 1))) 79%, rgb(11 14 22 / calc(.588 * var(--shade, 1))) 84.25%, rgb(11 14 22 / calc(.726 * var(--shade, 1))) 89.5%, rgb(11 14 22 / calc(.823 * var(--shade, 1))) 94.75%, rgb(11 14 22 / calc(.86 * var(--shade, 1)))); }
+/* top — высота шапки (72px + линия) и зазор 30–64px: на низких окнах заголовок не прилипает к шапке (правка 2026-10-04) */
+.hero__title { position: absolute; z-index: 1; left: var(--gutter); right: var(--gutter); top: calc(73px + clamp(30px, 6vh, 64px)); margin: 0;
+  font-size: var(--text-h1); line-height: .9; letter-spacing: -.03em; }
+/* прелоадер: строка и линия загрузки по центру чёрного экрана (как «Появление»); виден, пока у html класс hero-wait
+   (ставит скрипт в <head>, снимает home.js), потом уходит вверх и гаснет, а снизу поднимается окно с машиной */
+.hero__intro { position: absolute; inset: 0; z-index: 2; display: grid; justify-items: center; align-content: center; gap: 22px; padding: 0 var(--gutter); text-align: center;
+  opacity: 0; visibility: hidden; transform: translateY(-48px); transition: opacity .7s var(--ease), transform .9s var(--ease), visibility 0s linear .9s; }
+.hero-wait .hero__intro { opacity: 1; visibility: visible; transform: none; transition: none; }
+.hero__kicker { margin: 0; font-size: var(--text-small); color: var(--color-muted); }
+.hero__slogan span { display: block; }
+.hero__slogan { margin: 0; font-family: var(--font-heading); font-weight: 300; font-size: clamp(30px, 3.4vw, 56px); line-height: 1.08; letter-spacing: -.015em; }
+/* линия загрузки — шкала делений (правка 2026-10-04): шаг 7px, тонкие серые деления, слева направо загораются
+   шампанью по одному. Ширина и заливка кратны шагу — деление не обрезается (без round() — просто плавная заливка) */
+.hero__load { width: min(539px, 84vw); width: round(down, min(539px, 84vw), 7px); text-align: left; }
+.hero__loadbar { position: relative; height: 18px;
+  background: repeating-linear-gradient(90deg, transparent 0 1px, rgb(238 235 228 / .26) 1px 2px, transparent 2px 7px); }
+.hero__loadbar i { position: absolute; inset: 0 auto 0 0; width: calc(var(--load, 0) * 100%); width: round(up, calc(var(--load, 0) * 100%), 7px);
+  background: repeating-linear-gradient(90deg, var(--color-accent) 0 3px, transparent 3px 7px); }
+.hero__count { margin: 12px 0 0; font-size: 13px; color: var(--color-muted); font-variant-numeric: tabular-nums; }
+.hero__count span { color: var(--color-text); }
+/* шапка, заголовок и панель проявляются, пока раскрывается окно */
+.js .hero__title, .js .hero__bar { transition: opacity 1s var(--ease) 1.25s, transform 1.2s var(--ease) 1.25s; }
+.js [data-include="header"] { transition: opacity 1s var(--ease) 1.4s, background-color .5s var(--ease), border-color .5s var(--ease); }
+.hero-wait .hero__title, .hero-wait .hero__bar { opacity: 0; transform: translateY(24px); transition: none; }
+.hero-wait [data-include="header"] { opacity: 0; transition: none; }
+/* подпись плана монтажа — над панелью справа (телефон — над кнопкой) */
+.hero__shot { position: absolute; right: 0; bottom: calc(100% + 22px); display: grid; gap: 4px; justify-items: end; margin: 0; text-align: right; text-shadow: 0 1px 18px rgb(0 0 0 / .6); }
+.hero__shot b { font-size: 13px; font-weight: 600; color: var(--color-accent); font-variant-numeric: tabular-nums; }
+.hero__shot span { font-size: 17px; }
+/* смена плана: подпись не гаснет (правка 2026-10-04, третий пакет: «текст то появляется, то исчезает») — новый текст
+   встаёт в момент «провала в темноту» и чуть доезжает снизу */
+.hero__shot.is-new b, .hero__shot.is-new span { animation: shot-in .6s var(--ease); }
+@keyframes shot-in { from { opacity: .55; transform: translateY(6px); } }
+@media (prefers-reduced-motion: reduce) { .hero__shot.is-new b, .hero__shot.is-new span { animation: none; } }
+.no-webgl .hero__shot { display: none; }
+.hero__title span { display: block; }
+.hero__bar { position: absolute; z-index: 1; left: var(--gutter); right: var(--gutter); bottom: clamp(20px, 4vh, 40px);
+  display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .8fr) minmax(0, 1fr); gap: 32px; align-items: end;
+  padding-top: 20px; border-top: 1px solid var(--color-line); }
+.hero__bar .lead { margin-bottom: 18px; max-width: 42ch; font-size: 16px; }
+.hero__fact .num { font-size: var(--text-num); }
+.hero__fact p { margin: 8px 0 0; color: var(--color-muted); font-size: 14px; }
+.hero .poster { position: absolute; left: 50%; top: 50%; width: min(860px, 92vw); transform: translate(-44%, -48%); }
+.paint { justify-self: end; text-align: right; }
+.paint__label { margin: 0 0 12px; font-size: 14px; color: var(--color-muted); }
+.paint__label b { color: var(--color-text); font-weight: 500; }
+.paint__list { display: flex; gap: 10px; justify-content: flex-end; }
+.swatch { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--color-line); padding: 5px; background: transparent; cursor: pointer; transition: border-color var(--transition-soft) var(--ease); }
+.swatch::before { content: ""; display: block; width: 100%; height: 100%; border-radius: 50%; background: var(--sw); box-shadow: inset 0 -6px 10px rgb(0 0 0 / .35), inset 0 4px 8px rgb(255 255 255 / .18); }
+.swatch[aria-pressed="true"] { border-color: var(--color-accent); }
+.no-webgl .paint { visibility: hidden; }
+
+/* ---------- подложки под текст поверх 3D (Почему из Китая, Модели, Заявка) ----------
+   Правка 2026-10-04: подложка-градиент обрывалась на границе секции, и между блоками над машиной была «непонятная полоса».
+   Теперь подложка — слой ::before, который гаснет к верху и низу секции; затемнение низа первого экрана продолжается
+   в начало «Почему из Китая» (::after) и тоже гаснет. На стыке двух блоков обе подложки равны нулю — края нет. */
+.why, .models, .contact { isolation: isolate; }
+.why::before, .models::before, .contact::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, rgb(0 0 0 / 0) 0%, rgb(0 0 0 / 0.074) 3.3%, rgb(0 0 0 / 0.259) 6.7%, rgb(0 0 0 / 0.5) 10%, rgb(0 0 0 / 0.741) 13.3%, rgb(0 0 0 / 0.926) 16.7%, rgb(0 0 0 / 1) 20%, rgb(0 0 0 / 1) 80%, rgb(0 0 0 / 0.926) 83.3%, rgb(0 0 0 / 0.741) 86.7%, rgb(0 0 0 / 0.5) 90%, rgb(0 0 0 / 0.259) 93.3%, rgb(0 0 0 / 0.074) 96.7%, rgb(0 0 0 / 0) 100%); mask-image: linear-gradient(180deg, rgb(0 0 0 / 0) 0%, rgb(0 0 0 / 0.074) 3.3%, rgb(0 0 0 / 0.259) 6.7%, rgb(0 0 0 / 0.5) 10%, rgb(0 0 0 / 0.741) 13.3%, rgb(0 0 0 / 0.926) 16.7%, rgb(0 0 0 / 1) 20%, rgb(0 0 0 / 1) 80%, rgb(0 0 0 / 0.926) 83.3%, rgb(0 0 0 / 0.741) 86.7%, rgb(0 0 0 / 0.5) 90%, rgb(0 0 0 / 0.259) 93.3%, rgb(0 0 0 / 0.074) 96.7%, rgb(0 0 0 / 0) 100%); }
+/* фон блоков с машиной — синеватый, как на первом экране (правка 2026-10-04, четвёртый пакет): подложка — тёмно-синяя,
+   цвета края фона (#0b0e16), а не чёрная — на синем не появляется чёрное пятно. Спад — плавный, по S-кривой (9 точек):
+   у прямого градиента на изломах был виден вертикальный край — свет и туман на полу казались обрезанными (правка 2026-10-05) */
+.why::before { background: linear-gradient(90deg, rgb(11 14 22 / 0.9) 24%, rgb(11 14 22 / 0.861) 29.5%, rgb(11 14 22 / 0.759) 35%, rgb(11 14 22 / 0.615) 40.5%, rgb(11 14 22 / 0.45) 46%, rgb(11 14 22 / 0.285) 51.5%, rgb(11 14 22 / 0.141) 57%, rgb(11 14 22 / 0.039) 62.5%, rgb(11 14 22 / 0) 68%); }
+.models::before { background: linear-gradient(270deg, rgb(11 14 22 / 0.9) 28%, rgb(11 14 22 / 0.861) 33.3%, rgb(11 14 22 / 0.759) 38.5%, rgb(11 14 22 / 0.615) 43.8%, rgb(11 14 22 / 0.45) 49%, rgb(11 14 22 / 0.285) 54.3%, rgb(11 14 22 / 0.141) 59.5%, rgb(11 14 22 / 0.039) 64.8%, rgb(11 14 22 / 0) 70%); }
+.contact::before { background: linear-gradient(90deg, rgb(11 14 22 / 0.92) 32%, rgb(11 14 22 / 0.88) 37.5%, rgb(11 14 22 / 0.776) 43%, rgb(11 14 22 / 0.629) 48.5%, rgb(11 14 22 / 0.46) 54%, rgb(11 14 22 / 0.291) 59.5%, rgb(11 14 22 / 0.144) 65%, rgb(11 14 22 / 0.04) 70.5%, rgb(11 14 22 / 0) 76%); }
+.why::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 42vh; z-index: -1; pointer-events: none; opacity: var(--shade, 1); background: linear-gradient(180deg, rgb(11 14 22 / .86), rgb(11 14 22 / .823) 12.5%, rgb(11 14 22 / .726) 25%, rgb(11 14 22 / .588) 37.5%, rgb(11 14 22 / .43) 50%, rgb(11 14 22 / .272) 62.5%, rgb(11 14 22 / .134) 75%, rgb(11 14 22 / .037) 87.5%, rgb(11 14 22 / 0)); }
+
+/* ---------- 2. Почему из Китая: текст слева, машина в профиль справа ---------- */
+.why { min-height: 100svh; display: flex; align-items: center; }
+.why .inner { width: 100%; }
+.why__col { max-width: 640px; container-type: inline-size; }
+/* заголовок в две строки: «Почему / из Китая» — вторая строка не переносится, размер — по ширине колонки (правка 2026-10-04, четвёртый пакет) */
+.why h2 { margin-bottom: var(--space-4); font-size: min(var(--text-h2), 9.4cqi); }
+.why h2 .accent { display: block; white-space: nowrap; }
+.points { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
+.points li { display: grid; grid-template-columns: 34px 1fr; gap: 16px; max-width: none; }
+.points li::before { content: attr(data-n); display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--color-accent); color: var(--color-accent); font-weight: 700; font-size: 14px; }
+.points b { display: block; margin-bottom: 4px; font-weight: 600; }
+.points span { color: var(--color-muted); font-size: 15px; line-height: 1.5; }
+
+/* ---------- 3. Модели: машина 3/4 сзади слева, список справа ---------- */
+.models { min-height: 100svh; display: flex; align-items: center; }
+.models .inner { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 620px); }
+/* «Что можно привезти» широким шрифтом ≈ 11 em — размер по ширине колонки списка (L38) */
+.models__col { container-type: inline-size; }
+.models h2 { font-size: min(var(--text-h2), 8.8cqi); }
+.models__col { grid-column: 2; }
+.models h2 { margin-bottom: var(--space-2); }
+.models .lead { margin-bottom: var(--space-4); }
+.mlist { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--color-line); }
+.mlist li { max-width: none; border-bottom: 1px solid var(--color-line); }
+.mrow { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; gap: 16px; align-items: center; width: 100%; min-height: 64px; padding: 12px 4px; background: none; border: 0; color: var(--color-text); text-align: left; cursor: pointer; transition: background-color var(--transition-soft) var(--ease); }
+.mrow i { width: 14px; height: 14px; border-radius: 50%; background: var(--sw); border: 1px solid rgb(255 255 255 / .25); }
+.mrow b { display: block; font-weight: 600; font-size: 17px; }
+.mrow small { color: var(--color-muted); font-size: 14px; }
+.mrow span:last-child { font-variant-numeric: tabular-nums; color: var(--color-muted); font-size: 15px; white-space: nowrap; }
+.mrow[aria-pressed="true"] { background: rgb(214 178 115 / .08); }
+.mrow[aria-pressed="true"] span:last-child { color: var(--color-accent); }
+/* машина подгружается — кружок цвета мягко пульсирует (при reduce — просто приглушён, base.css гасит анимации) */
+.mrow[data-loading] i { animation: mrow-load .9s var(--ease) infinite alternate; }
+@keyframes mrow-load { to { opacity: .35; transform: scale(.75); } }
+@media (prefers-reduced-motion: reduce) { .mrow[data-loading] i { animation: none; opacity: .5; } }
+
+/* ---------- 4. Калькулятор: заголовок на всю ширину, ниже две равные колонки — поля и чек (правка 2026-10-04) ---------- */
+.calc { background: rgb(11 14 22 / .9); }
+.calc .inner { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-5); align-items: start; }
+.calc__head { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-3) var(--space-5); align-items: end; }
+.calc h2 { margin: 0; }
+.calc .lead { margin: 0; }
+.fields { display: grid; gap: var(--space-3); }
+.field { display: grid; gap: 8px; }
+.field > span, .field legend { font-size: 14px; color: var(--color-muted); padding: 0; }
+.field select, .field input[type="number"] { width: 100%; min-width: 0; min-height: var(--control-height); padding: 10px 14px; border: 1px solid var(--color-line); border-radius: var(--radius); background: var(--color-surface); color: var(--color-text); font-size: 17px; }
+.field input[aria-invalid] { border-color: #a3341f; }   /* цена вне 10 000…5 000 000 ¥ — в чеке прочерки */
+.field select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--color-muted) 50%), linear-gradient(135deg, var(--color-muted) 50%, transparent 50%); background-position: calc(100% - 22px) 50%, calc(100% - 16px) 50%; background-size: 6px 6px; background-repeat: no-repeat; padding-right: 44px; }
+fieldset.field { border: 0; margin: 0; padding: 0; }
+.field[hidden] { display: none; }   /* квота — только для электромобилей (calc.js ставит hidden) */
+.seg { display: flex; flex-wrap: wrap; gap: 8px; }
+.seg label { position: relative; }
+.seg input { position: absolute; opacity: 0; inset: 0; }
+.seg span { display: inline-flex; align-items: center; min-height: var(--control-height-small); padding: 8px 16px; border: 1px solid var(--color-line); border-radius: var(--radius); font-size: 15px; cursor: pointer; transition: border-color var(--transition-soft) var(--ease), color var(--transition-soft) var(--ease); }
+.seg input:checked + span { border-color: var(--color-accent); color: var(--color-accent); }
+.seg input:focus-visible + span { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.calc__type { margin: 0; font-size: 15px; }
+.ticket { container-type: inline-size; padding: 26px 26px 24px; background: var(--color-surface); border: 1px solid var(--color-line); border-radius: var(--radius); position: sticky; top: var(--header-offset); }
+.ticket__note { margin: 0 0 16px; font-size: 13px; color: var(--color-muted); }
+.ticket dl { margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 12px 16px; font-size: 15px; }
+.ticket dt { color: var(--color-muted); }
+.ticket dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ticket__total { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; margin: 18px 0 4px; padding-top: 16px; border-top: 1px dashed #3a3e48; }
+.ticket__total > span:first-child { font-size: 15px; color: var(--color-muted); }
+/* итог — по ширине чека (cqi): «1 263 401 BYN» помещается в плашку на любом экране */
+.ticket__total .num { max-width: 100%; font-size: clamp(22px, 2.6vw, 38px); font-size: clamp(22px, 5.4cqi, 56px); color: var(--color-accent); }
+.ticket__usd { margin: 0 0 20px; font-size: 14px; color: var(--color-muted); }
+.ticket .button { width: 100%; }
+.calc__rates { margin: var(--space-3) 0 0; max-width: 60ch; }
+
+/* ---------- 5. Путь: закреплённая сцена, машина едет по линии ---------- */
+.route { position: relative; }
+.js .route { height: 340vh; }
+.route__stage { position: relative; padding: var(--space-section) var(--gutter); }
+.js .route__stage { position: sticky; top: 0; height: 100svh; padding: 0; overflow: hidden; }
+.route__head { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: var(--space-3); align-items: end; max-width: var(--container); margin: 0 auto; }
+.js .route__head { position: absolute; left: var(--gutter); right: var(--gutter); top: var(--space-stage-top); }
+.route__day { justify-self: end; display: grid; justify-items: end; text-align: right; color: var(--color-muted); font-size: 14px; }
+.route__day p { margin: 0; max-width: none; }
+.route__day .num { margin: 4px 0 12px; font-size: clamp(48px, 6vw, 96px); color: var(--color-text); font-variant-numeric: tabular-nums; }
+.route__day-label { color: var(--color-text); font-size: 15px; }
+/* текущий этап: номер, название и срок — сменяются за прокруткой с коротким затуханием (home.js) */
+.route__now { display: grid; gap: 2px; transition: opacity .35s var(--ease), transform .35s var(--ease); }
+.route__now.is-swap { opacity: 0; transform: translateY(8px); }
+.route__now span:first-child { font-size: 13px; color: var(--color-accent); font-variant-numeric: tabular-nums; }
+.route__now b { color: var(--color-text); font-size: clamp(18px, 1.5vw, 24px); font-weight: 600; line-height: 1.25; }
+.route__now span:last-child { font-size: 15px; }
+.route__via { margin-top: 12px !important; font-size: 13px; }
+.route__line { position: relative; max-width: none; margin: var(--space-4) 0 0; }
+.js .route__line { position: absolute; left: var(--gutter); right: var(--gutter); top: var(--floor-y, 70%); margin: 0; }
+.route__line::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--color-line); }
+.route__line::after { content: ""; position: absolute; left: 0; top: 0; height: 2px; width: calc(var(--progress, 1) * 100%); background: var(--color-accent); }
+.route__stops { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.route__stops li { position: relative; max-width: none; padding: 22px 12px 0 0; font-size: 14px; line-height: 1.4; color: var(--color-muted); transition: color var(--transition-soft) var(--ease); }
+.route__stops li::before { content: ""; position: absolute; left: -5px; top: -5px; width: 12px; height: 12px; border-radius: 50%; background: var(--color-bg); border: 2px solid var(--color-line); transition: border-color var(--transition-soft) var(--ease), background-color var(--transition-soft) var(--ease); }
+.route__stops li:last-child::after { content: ""; position: absolute; right: -5px; top: -5px; width: 12px; height: 12px; border-radius: 50%; background: var(--color-accent); }
+.route__stops b { display: block; color: var(--color-text); font-weight: 600; font-size: 15px; }
+.route__stops li.is-done::before, .route__stops li.is-active::before { border-color: var(--color-accent); }
+.route__stops li.is-done::before { background: var(--color-accent); }
+.route__stops li.is-active b { color: var(--color-accent); }
+
+/* ---------- 6. Оплата: стопка карточек слева, справа — 3D-машина меняется с этапом (правки 2026-10-04) ---------- */
+/* Секция прозрачная — за ней холст с машиной: этап 1 — силуэт, этап 2 — вспышки фотоотчёта и рамка видоискателя,
+   этап 3 — фары. Стопка: home.js задаёт --in (0 — ниже экрана, 1 — на месте) и --depth (сколько этапов легло сверху):
+   нижние карточки уменьшаются, темнеют и выглядывают краем над верхней. */
+.pay { position: relative; }
+.js .pay { height: 300vh; }
+.pay__stage { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .92fr); grid-template-rows: auto minmax(0, 1fr) auto; gap: clamp(16px, 3vh, 40px) var(--space-5);
+  padding: var(--space-section) var(--gutter); }
+.js .pay__stage { position: sticky; top: 0; height: 100svh; padding: var(--space-stage-top) var(--gutter) clamp(16px, 4vh, 40px); overflow: hidden; }
+.pay__head { grid-column: 1; grid-row: 1; align-self: start; }
+.pay__head .lead { max-width: 54ch; }
+.pay__head h2 { margin-bottom: var(--space-2); }
+/* «Оплачено» — на уровне заголовка, по центру правой колонки над машиной (правка 2026-10-07, окно 1890: стояло по низу
+   абзаца и налезало на высокую машину — Haval Dargo) */
+.pay__paid { grid-column: 2; grid-row: 1; align-self: start; container-type: inline-size; justify-self: center; width: min(100%, 480px); text-align: center; }
+.pay__paid-label { margin: 0; font-size: 15px; }
+.pay__paid .num { margin: 6px 0 14px; font-size: clamp(26px, 3.6vw, 60px); font-size: clamp(24px, 7.4cqi, 60px); font-stretch: 140%; color: var(--color-accent); font-variant-numeric: tabular-nums; }
+.pay__bar { display: flex; gap: 3px; height: 10px; }
+.pay__bar i { flex: var(--share) 1 0; min-width: 8px; overflow: hidden; background: var(--color-line); border-radius: 1px; }
+.pay__bar b { display: block; height: 100%; background: var(--color-accent); transform-origin: left; transition: transform .9s var(--ease); }
+.js .pay__bar i:not(.is-paid) b { transform: scaleX(0); }
+.pay__paid-of { margin: 10px 0 0; color: var(--color-muted); font-size: 14px; }
+/* низ карточки и низ подписи этапа — одна линия (правка 2026-10-07): стопка прижата к низу своей строки, подпись — тоже */
+.pay__stack { grid-column: 1; grid-row: 2; align-self: end; list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+.js .pay__stack { gap: 0; padding-top: clamp(40px, 6vh, 52px); }
+.pay__note { grid-column: 1; grid-row: 3; margin: 0; }
+.pay__card { position: relative; max-width: none; display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(10px, 1.8vh, 16px); container-type: inline-size;
+  padding: clamp(20px, min(2.2vw, 3.6vh), 36px); background: var(--color-surface); border: 1px solid #2b3346; border-radius: var(--radius); box-shadow: 0 -10px 30px rgb(0 0 0 / .45);
+  transition: border-color .8s var(--ease); }
+/* нижние карточки темнеют под верхней — тёмным слоем, а не фильтром яркости: фильтр перерисовывал карточку каждый кадр */
+.js .pay__card { grid-area: 1 / 1; transform-origin: 50% 0;
+  transform: translateY(calc((1 - var(--in, 1)) * 100vh - var(--depth, 0) * 24px)) scale(calc(1 - var(--depth, 0) * .04)); }
+.js .pay__card::after { content: ""; position: absolute; inset: -1px; border-radius: inherit; background: #000; opacity: calc(var(--depth, 0) * .16); pointer-events: none; }
+.pay__card.is-top { border-color: rgb(214 178 115 / .55); }
+/* рамка видоискателя и подпись этапа — над машиной справа */
+/* рамка сверху, подпись под ней с постоянным зазором (правка 2026-10-06, шестой пакет: на окнах 1366–1520 подпись
+   стояла на 18% от низа и заезжала на нижние углы рамки) */
+.pay__view { grid-column: 2; grid-row: 2; position: relative; pointer-events: none; display: flex; flex-direction: column; }
+.pay__corners { position: relative; flex: 1 1 auto; margin: 9px 2% 0; opacity: 0; transform: scale(1.05); transition: opacity .6s var(--ease), transform .9s var(--ease); }
+.pay[data-stage="2"] .pay__corners { opacity: 1; transform: none; }
+.pay__corners i { position: absolute; width: 30px; height: 30px; border: 0 solid var(--color-accent); }
+.pay__corners i:nth-child(1) { left: 0; top: 0; border-width: 2px 0 0 2px; }
+.pay__corners i:nth-child(2) { right: 0; top: 0; border-width: 2px 2px 0 0; }
+.pay__corners i:nth-child(3) { left: 0; bottom: 0; border-width: 0 0 2px 2px; }
+.pay__corners i:nth-child(4) { right: 0; bottom: 0; border-width: 0 2px 2px 0; }
+/* вспышки фотоотчёта — вместе со вспышками света в 3D (showroom.js, PHOTO). Свечение гаснет до нуля внутри своей
+   области (closest-side): прежний градиент шёл дальше краёв, и вспышка обрывалась прямоугольником (правка 2026-10-04,
+   четвёртый пакет) */
+.pay__view::after { content: ""; position: absolute; inset: -14% -5% 2%; background: radial-gradient(closest-side, rgb(255 255 255 / .46), rgb(255 255 255 / .14) 55%, rgb(255 255 255 / 0)); opacity: 0; }
+.pay[data-stage="2"] .pay__view::after { animation: pay-flash 1.5s linear 1; }
+@keyframes pay-flash { 0%, 6%, 21%, 29%, 37%, 45%, 71%, 79%, 85%, 93%, 100% { opacity: 0; } 1%, 23%, 39%, 73%, 87% { opacity: .55; } }
+.pay__tag { position: relative; margin: 14px 0 0 2%; display: grid; gap: 4px; max-width: 36ch; text-shadow: 0 1px 16px rgb(0 0 0 / .8); transition: opacity .35s var(--ease); }
+.pay__tag b { font-size: 13px; font-weight: 600; color: var(--color-accent); }
+.pay__tag span { font-size: 16px; line-height: 1.4; }
+.pay__tag.is-swap { opacity: 0; }
+.no-webgl .pay__view { display: none; }
+.no-webgl .pay__stack { grid-column: 1 / -1; }
+.pay__when { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; color: var(--color-muted); font-size: 14px; }
+.pay__when b { color: var(--color-accent); font-weight: 600; }
+/* сумма — по ширине карточки (cqi), с запасом на «1 263 401 BYN» (L13) */
+.pay__card .num { margin: 8px 0 10px; font-size: clamp(28px, 6vw, 84px); font-size: clamp(28px, min(7.4cqi, 8vh), 84px); font-stretch: 150%; font-variant-numeric: tabular-nums; transition: color .8s var(--ease); }
+.pay__card.is-top .num { color: var(--color-accent); }
+.pay__what { margin: 0; color: var(--color-muted); font-size: 16px; line-height: 1.5; max-width: 52ch; }
+.pay__proof { display: grid; gap: 12px; padding-top: var(--space-2); border-top: 1px solid var(--color-line); }
+.pay__proof p { margin: 0; font-size: 14px; color: var(--color-muted); }
+.pay__proof ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 10px 24px; }
+.pay__proof li { position: relative; max-width: none; padding-left: 32px; font-size: 17px; line-height: 1.35; }
+.pay__proof li::before { content: ""; position: absolute; left: 0; top: 0; width: 21px; height: 21px; border-radius: 50%; border: 1px solid var(--color-accent); }
+.pay__proof li::after { content: ""; position: absolute; left: 8px; top: 5px; width: 5px; height: 9px; border: solid var(--color-accent); border-width: 0 2px 2px 0; transform: rotate(45deg); }
+
+/* ---------- 7. Что не привезём: горизонтальная лента (правка 2026-10-04) ---------- */
+/* Блок закрепляется (класс is-pinned ставит home.js), карточки едут вбок за прокруткой; текущая — тёмная, крест прорисовывается.
+   Без JS и на низком телефоне — лента листается пальцем. */
+.cant { position: relative; }
+.cant__stage { display: grid; grid-template-columns: minmax(0, 1fr); align-content: center; gap: var(--space-4); padding: var(--space-section) 0; overflow: hidden; }
+.cant.is-pinned .cant__stage { position: sticky; top: 0; height: 100svh; align-content: start; padding: var(--space-stage-top) 0 clamp(20px, 4vh, 40px); }
+/* стрелки внизу всегда в кадре: на невысоком экране ужимаются карточки, а не полоса со стрелками (правка 2026-10-06) */
+.cant.is-pinned .cant__stage { grid-template-rows: auto minmax(0, auto) auto; }
+.cant.is-pinned .cant__viewport { min-height: 0; }
+.cant.is-pinned .cant__track { height: 100%; }
+.cant.is-pinned .cant__card { min-height: 0; height: var(--card-h); max-height: 100%; }
+/* невысокое окно компьютера (правка 2026-10-07, адаптив 1520: у ноутбука со 125% и панелями браузера странице остаётся
+   ~570px — карточка сжималась до 200px, заголовок и текст вылезали под неё на полосу со стрелками): содержимое карточки
+   ужимается по её высоте (cqh), отступы блока — по высоте окна. На окне от ~730px всё как было */
+@media (min-width: 901px) {
+  .cant.is-pinned .cant__card { container-type: size; padding: clamp(18px, min(2.4vw, 5vh), 36px); }
+  .cant.is-pinned .cant__num { font-size: clamp(40px, min(6vw, 33cqh), 112px); }
+  .cant.is-pinned .cant__card h3 { margin-top: min(var(--space-4), 15cqh); margin-bottom: min(12px, 5cqh); }
+  .cant.is-pinned .cant__x { top: clamp(18px, min(2.4vw, 5vh), 36px); right: clamp(18px, min(2.4vw, 5vh), 36px); }
+}
+/* совсем невысокое окно (до 540px; ниже 500 лента не закрепляется): текст карточки чуть мельче (правка 2026-10-07, адаптив 1366) */
+@media (min-width: 901px) and (max-height: 540px) {
+  .cant.is-pinned .cant__card p { font-size: 15px; line-height: 1.4; }
+  .cant.is-pinned .cant__card h3 { margin-top: min(var(--space-4), 7cqh); margin-bottom: min(12px, 3cqh); }
+}
+@media (min-width: 901px) and (max-height: 700px) {
+  .cant.is-pinned .cant__stage { padding-top: max(calc(var(--header-offset) + 16px), 18vh); gap: clamp(16px, 4vh, 40px); padding-bottom: clamp(14px, 3vh, 40px); }
+}
+.cant__head { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto; gap: var(--space-3) var(--space-5); align-items: end; padding: 0 var(--gutter); }
+.cant__head .lead { margin: 0; }
+.cant__count { margin: 0; font-family: var(--font-heading); font-stretch: 150%; font-weight: 700; font-size: clamp(20px, 2vw, 32px); line-height: 1; font-variant-numeric: tabular-nums; color: var(--color-muted); white-space: nowrap; }
+.cant__count span { color: var(--color-text); }
+html:not(.js) .cant__count, html:not(.js) .cant__foot { display: none; }   /* без JS — только лента, которую листают пальцем */
+/* слайдер (правка 2026-10-06, адаптив 1240: на невысоком окне лента не закреплялась и мышью не листалась):
+   стрелки справа от полосы прогресса листают по одной карточке — в закреплённом блоке прокручивают страницу, иначе — саму ленту */
+.cant__arrow { display: grid; place-items: center; width: 48px; height: 48px; padding: 0; color: var(--color-text); background: transparent;
+  border: 1px solid color-mix(in srgb, var(--color-text) 28%, transparent); border-radius: var(--radius); cursor: pointer;
+  transition: background-color .5s var(--ease), color .5s var(--ease), opacity .5s var(--ease); }
+.cant__arrow svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: square; }
+.cant__arrow:disabled { opacity: .3; cursor: default; }
+.cant__arrow:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+.cant__viewport { overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; padding: 0 var(--gutter); scroll-padding-inline: var(--gutter); }
+.cant__viewport::-webkit-scrollbar { display: none; }
+.js .cant__viewport { scroll-snap-type: none; }   /* со скриптом ленту ставят стрелки и мышь — по пяти остановкам (home.js) */
+.cant__viewport.is-drag { cursor: grabbing; user-select: none; }
+.cant.is-pinned .cant__viewport { overflow: visible; scroll-snap-type: none; }
+.cant__track { list-style: none; margin: 0; padding: 0; display: flex; gap: var(--space-2); width: max-content; }
+.cant.is-pinned .cant__track { transform: translate3d(calc(var(--x, 0) * -1px), 0, 0); will-change: transform; }
+.cant__card { position: relative; flex: none; max-width: none; width: clamp(280px, 30vw, 460px); --card-h: clamp(300px, 52vh, 520px); min-height: var(--card-h);
+  display: grid; grid-template-rows: 1fr auto auto; align-content: start; padding: clamp(22px, 2.4vw, 36px);
+  background: var(--color-surface); border: 1px solid color-mix(in srgb, #15161a calc(var(--k) * 100%), var(--color-line)); border-radius: var(--radius); scroll-snap-align: start;
+  isolation: isolate; color: color-mix(in srgb, #eeebe4 calc(var(--k) * 100%), var(--color-text));
+  --k: max(var(--on, 0), var(--hov)); transition: --hov .6s var(--ease); }
+/* тёмный фон текущей карточки — за прокруткой (правка 2026-10-06, шестой пакет: фон менялся сам, за 0,7 с, быстрее
+   прокрутки): --on 0…1 ставит home.js по положению ленты, тёмный слой и цвета текста следуют за ним без задержки */
+.cant__card::before { content: ""; position: absolute; inset: -1px; z-index: -1; border-radius: inherit; background: #15161a; opacity: var(--k); }
+/* карточка под курсором тоже темнеет (правка 2026-10-06, адаптив 1240): --hov плавно 0 → 1 за 0,6 с, итог — бо́льшее
+   из «текущая за прокруткой» и «под курсором»; крест прорисовывается */
+@property --hov { syntax: '<number>'; inherits: true; initial-value: 0; }
+@media (hover: hover) {
+  .cant__card:hover { --hov: 1; }
+  .cant.is-pinned .cant__track .cant__card:hover .cant__x path { stroke-dashoffset: 0; }   /* сильнее правила «ещё не видели» ниже */
+  .cant__arrow:not(:disabled):hover { background: var(--color-text); color: var(--color-bg); }
+  .cant:not(.is-pinned) .cant__viewport { cursor: grab; }
+}
+.cant__num { font-family: var(--font-heading); font-stretch: 190%; font-weight: 800; font-size: clamp(56px, 6vw, 112px); line-height: .9; letter-spacing: -.03em;
+  color: transparent; -webkit-text-stroke: 1.2px color-mix(in srgb, #d6b273 calc(var(--k) * 100%), #b3ac9d); }
+.cant__x { position: absolute; right: clamp(22px, 2.4vw, 36px); top: clamp(22px, 2.4vw, 36px); width: clamp(30px, 2.6vw, 44px); height: auto; overflow: visible; }
+.cant__x path { fill: none; stroke: color-mix(in srgb, #d6b273 calc(var(--k) * 100%), var(--color-accent)); stroke-width: 2.6; stroke-linecap: square; stroke-dasharray: 1; stroke-dashoffset: 0; transition: stroke-dashoffset .6s var(--ease); }
+.cant__x path + path { transition-delay: .22s; }
+.cant.is-pinned .cant__card:not(.is-seen) .cant__x path { stroke-dashoffset: 1; }
+.cant__card h3 { margin: var(--space-4) 0 12px; font-size: clamp(19px, 1.5vw, 26px); font-stretch: 125%; font-weight: 800; line-height: 1; letter-spacing: -.01em; text-transform: uppercase; text-wrap: balance; }
+.cant__card p { margin: 0; color: color-mix(in srgb, #a9abb2 calc(var(--k) * 100%), var(--color-muted)); font-size: 16px; line-height: 1.5; }
+/* текущая карточка — тёмная, номер и крест — светлой шампанью (через --on, см. выше) */
+.cant__foot { display: flex; align-items: center; gap: 10px; padding: 0 var(--gutter); }
+.cant__progress { flex: 1; height: 2px; margin-right: 14px; background: var(--color-line); }
+.cant__progress i { display: block; height: 100%; width: calc(var(--p, 0) * 100%); background: var(--color-accent); }
+
+/* ---------- 8. Цифры и отзывы ---------- */
+/* фон — синеватый «зал» первого экрана, тот же градиент, что у холста (showroom.js → sky): правка 2026-10-07, окно 1890 —
+   прежний градиент гас к 72% и низ блока под карточками был почти чёрным */
+.trust { background: radial-gradient(120% 95% at 50% 40%, #2a3350, var(--color-bg)); }
+/* колонки цифр — та же сетка, что у карточек отзывов (тот же промежуток): цифра стоит над краем своей карточки
+   (правка 2026-10-06, адаптив 1240: при промежутке 40px у цифр и 16px у карточек третья цифра уезжала правее карточки) */
+.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4) var(--space-2); margin-bottom: var(--space-5); }
+.facts > div { border-top: 1px solid var(--color-line); padding-top: var(--space-3); }
+/* цифры — от ширины своей колонки (L13): «45–60 дней» широким шрифтом ≈ 8,6 em, раньше вылезали за колонку (правка 2026-10-04, четвёртый пакет) */
+.facts > div { container-type: inline-size; }
+.facts .num { font-size: clamp(30px, 11cqi, 72px); }
+.facts p { margin: 14px 0 0; color: var(--color-muted); }
+.reviews { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2); }
+/* карточка отзыва: цитата во всю ширину, внизу — автор слева и фото машины в правом нижнем углу (правка 2026-10-04).
+   Фото — внутри полей карточки, с теми же отступами, что у текста (третий пакет: фото «прилипало» к краям).
+   Фото — из открытых источников, без людей; авторы и лицензии — в подвале */
+.reviews li { max-width: none; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 46%); grid-template-rows: 1fr auto; gap: var(--space-3) var(--space-2);
+  padding: 28px; background: var(--color-surface); border: 1px solid var(--color-line); border-radius: var(--radius); overflow: hidden; }
+.reviews blockquote { grid-column: 1 / -1; margin: 0; font-size: 17px; line-height: 1.55; }
+.reviews footer { align-self: end; color: var(--color-muted); font-size: 14px; }
+.reviews__car { align-self: end; width: 100%; max-width: none; height: auto; aspect-ratio: 3 / 2; object-fit: cover; margin: 0; border-radius: 0; background: #1a1c22; }
+.reviews footer b { display: block; color: var(--color-text); font-weight: 600; }
+/* фото открывается на весь экран (правка 2026-10-05): ссылка вокруг фото, курсор-лупа */
+.reviews__zoom { align-self: end; display: block; border-radius: 0; overflow: hidden; cursor: zoom-in; }
+.reviews__zoom .reviews__car { transition: transform .8s var(--ease); }
+.reviews__foot { display: none; }
+/* отзывы на экране до 1100px — слайдер (правка 2026-10-07, адаптив 1100: карточки стояли столбиком во всю ширину,
+   фото было огромным): лента листается пальцем, колесом и стрелками, карточки и фото меньше; без JS — лента без стрелок */
+@media (max-width: 1100px) {
+  .reviews { display: flex; gap: var(--space-2); overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none;
+    margin: 0 calc(-1 * var(--gutter)); padding: 0 var(--gutter); scroll-padding-inline: var(--gutter); }
+  .reviews::-webkit-scrollbar { display: none; }
+  .reviews li { flex: 0 0 min(420px, 84%); scroll-snap-align: start; padding: 22px; grid-template-columns: minmax(0, 1fr) minmax(0, 38%); gap: var(--space-3) var(--space-2); }
+  .reviews blockquote { font-size: 16px; }
+  .js .reviews__foot { display: flex; align-items: center; gap: 10px; margin-top: var(--space-3); }
+  .reviews__count { margin: 0 14px 0 0; font-family: var(--font-heading); font-stretch: 150%; font-weight: 700; font-size: 20px; line-height: 1; font-variant-numeric: tabular-nums; color: var(--color-muted); white-space: nowrap; }
+  .reviews__count span { color: var(--color-text); }
+  .reviews__foot .cant__progress { margin-right: 14px; }
+}
+
+/* ---------- фото на весь экран: тёмный «зал», фото вырастает из карточки (home.js) ---------- */
+.lightbox { --pad: clamp(16px, 4vw, 64px); position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: var(--pad);
+  border: 0; background: transparent; color: var(--color-text); overflow: hidden; }
+.lightbox[open] { display: grid; place-items: center; }
+.lightbox::backdrop { background: transparent; }
+.lightbox__bg { position: absolute; inset: 0; background: rgb(11 14 22 / .94); opacity: 0; transition: opacity .6s var(--ease); }
+.lightbox__fig { position: relative; display: grid; justify-items: center; gap: 14px; margin: 0; max-width: 100%; }
+/* размер — от экрана, а не от файла: сначала показывается превью 480px, потом крупное фото — рамка не прыгает (все фото 3:2) */
+.lightbox__img { display: block; width: min(1600px, 100vw - 2 * var(--pad), (100svh - 2 * var(--pad) - 40px) * 1.5); height: auto; aspect-ratio: 3 / 2; object-fit: cover; max-width: none;
+  border-radius: 0; transform-origin: 0 0; transition: transform .8s var(--ease); cursor: zoom-out; }
+.lightbox__cap { font-size: 15px; color: var(--color-muted); opacity: 0; transition: opacity .6s var(--ease); }
+.lightbox__close { position: absolute; top: clamp(12px, 2vw, 24px); right: clamp(12px, 2vw, 24px); width: 48px; height: 48px; padding: 0; border: 1px solid var(--color-line); border-radius: var(--radius); cursor: pointer;
+  background: linear-gradient(45deg, transparent calc(50% - 1px), var(--color-text) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) 50% 50% / 18px 18px no-repeat,
+    linear-gradient(-45deg, transparent calc(50% - 1px), var(--color-text) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) 50% 50% / 18px 18px no-repeat, rgb(18 23 38 / .8);
+  opacity: 0; transition: opacity .6s var(--ease), border-color var(--transition-soft) var(--ease); }
+.lightbox.is-shown .lightbox__bg, .lightbox.is-shown .lightbox__cap, .lightbox.is-shown .lightbox__close { opacity: 1; }
+html.has-lightbox { overflow: hidden; }
+
+/* ---------- 9. Вопросы ---------- */
+.faq .inner { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: var(--space-5); }
+.faq__head { align-self: start; position: sticky; top: calc(var(--header-offset) + 16px); }
+.faq__head { container-type: inline-size; }
+/* «Вопросы» широким шрифтом ≈ 9,8 em — размер по ширине колонки, иначе налезал на аккордеон (правка 2026-10-04, четвёртый пакет) */
+.faq__head h2 { margin-bottom: var(--space-3); font-size: min(var(--text-h2), 9.6cqi); }
+.faq details { border-bottom: 1px solid var(--color-line); }
+.faq details:first-child { border-top: 1px solid var(--color-line); }
+.faq summary { display: grid; grid-template-columns: 1fr 32px; gap: 16px; align-items: center; min-height: 72px; padding: 14px 0; cursor: pointer; list-style: none; font-weight: 600; font-size: 17px; }
+.faq summary::-webkit-details-marker { display: none; }
+/* значок: «плюс» в квадрате, у открытого вопроса — «минус»; квадрат не поворачивается (правка 2026-10-05). Палочки —
+   фоном (не символом «+»): ровно по центру квадрата в любом шрифте, вертикальная плавно схлопывается */
+.faq summary::after { content: ""; width: 32px; height: 32px; background: linear-gradient(var(--color-accent-text), var(--color-accent-text)) 50% 50% / 12px 2px no-repeat,
+  linear-gradient(var(--color-accent-text), var(--color-accent-text)) 50% 50% / 2px 12px no-repeat, var(--color-accent);
+  transition: background-size var(--transition-soft) var(--ease); }
+.faq details[open] summary::after { background-size: 12px 2px, 2px 0, auto; }
+.faq details p { margin: 0 0 22px; color: var(--color-muted); max-width: 62ch; }
+
+/* ---------- 10. Заявка: форма слева, машина анфас справа ---------- */
+.contact { min-height: 100svh; display: flex; align-items: center; }
+.contact .inner { width: 100%; }
+.contact__col { max-width: 560px; }
+.contact h2 { margin-bottom: var(--space-3); }
+.contact .lead { margin-bottom: var(--space-4); }
+.contact .form { max-width: none; }
+.contact .form input:not([type="checkbox"]) { background: rgb(18 23 38 / .9); }
+.contact .button--arrow { width: 100%; justify-content: space-between; }
+.contact__links { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: var(--space-4); padding-top: var(--space-3); border-top: 1px solid var(--color-line); color: var(--color-muted); font-size: 15px; }
+.contact__links .chips { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
+.chips a { display: inline-flex; align-items: center; min-height: var(--control-height-small); padding: 8px 16px; border: 1px solid var(--color-line); border-radius: var(--radius); color: var(--color-text); text-decoration: none; transition: border-color var(--transition-soft) var(--ease); }
+.contact .poster { position: absolute; right: 0; bottom: 10%; width: min(640px, 48vw); }
+
+@media (hover: hover) {
+  .swatch:hover, .chips a:hover { border-color: var(--color-text); }
+  .mrow:hover { background: rgb(255 255 255 / .04); }
+  .seg span:hover { border-color: var(--color-text); }
+  .faq summary:hover { color: var(--color-accent); }
+  .reviews__zoom:hover .reviews__car { transform: scale(1.04); }
+  .lightbox__close:hover { border-color: var(--color-text); }
+}
+
+/* Компьютер: заголовок стоит над панелью с кнопкой, машина — в полосе между шапкой и заголовком (правка 2026-10-06,
+   шестой пакет: заголовок «слишком близко к шапке и далеко от кнопки»). Телефон — как был: заголовок сверху. */
+@media (min-width: 901px) {
+  .hero { display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: clamp(20px, 4vh, 40px); }
+  .hero__title { position: relative; top: auto; left: auto; right: auto; margin-bottom: clamp(22px, 4vh, 44px); }
+  .hero__bar { position: relative; left: auto; right: auto; bottom: auto; }
+  .hero::before { background: linear-gradient(180deg, rgb(11 14 22 / .7), rgb(11 14 22 / 0) 20%, rgb(11 14 22 / 0) 42%, rgb(11 14 22 / calc(.6 * var(--shade, 1))) 62%, rgb(11 14 22 / calc(.731 * var(--shade, 1))) 71.5%, rgb(11 14 22 / calc(.825 * var(--shade, 1))) 81%, rgb(11 14 22 / calc(.881 * var(--shade, 1))) 90.5%, rgb(11 14 22 / calc(.9 * var(--shade, 1)))); }
+  /* рендер вместо 3D (без JS или WebGL) — над заголовком, как машина */
+  .hero .poster { top: calc(73px + 3vh); width: min(780px, 56vw, calc((100svh - 73px) * 0.9)); transform: translate(-30%, 0); }
+}
+/* низкие окна компьютера: абзац панели первого экрана прячем, чтобы машине хватило высоты */
+@media (min-width: 901px) and (max-height: 760px) { .hero__bar .lead { display: none; } }
+
+/* ---------- средние экраны компьютера: 1101–1439 (правки 2026-10-07, адаптивы 1366–1100; 1520–1920 приняты) ---------- */
+@media (min-width: 901px) and (max-width: 1439px) {
+  /* «Пока другие ждут»: текст ниже (машина крупнее — data-scene → at) */
+  .js .speed__stage { padding-bottom: clamp(24px, 4.5vh, 48px); }
+  /* «45–60 дней»: заголовок — по центру относительно счётчика дней */
+  .route__head { align-items: center; }
+  /* «Почему из Китая»: колонка текста уже — не заходит на нос машины */
+  .why__col { max-width: min(640px, 45vw); }
+}
+@media (min-width: 901px) and (max-width: 1279px) {
+  /* заявка: поля уже — не заходят на машину (машина правее — data-scene → at) */
+  .contact__col { max-width: min(560px, 42vw); }
+}
+@media (min-width: 901px) and (max-width: 1150px) {
+  /* «Что можно привезти»: список — половина ширины (620px съедали место машины на 1024–960) */
+  .models .inner { grid-template-columns: minmax(0, 1fr) minmax(0, 50%); }
+  /* «Почему из Китая»: текст ещё уже, машина правее (data-scene → at) */
+  .why__col { max-width: 42vw; }
+}
+
+/* ---------- планшет ---------- */
+@media (max-width: 1100px) {
+  .faq .inner { grid-template-columns: minmax(0, 1fr); gap: var(--space-4); }
+  /* калькулятор (правка 2026-10-07, адаптив 1100): заголовок и абзац — друг под другом на всю ширину, поля и чек —
+     две равные колонки (были в одну колонку, чек уезжал под поля); в одну колонку — только от 700px */
+  .calc .inner { gap: var(--space-4) var(--space-3); }
+  .calc__head { grid-template-columns: minmax(0, 1fr); gap: var(--space-2); }
+  .calc__head .lead { max-width: none; }
+  .facts { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .facts > div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-3); align-items: end; padding: var(--space-3) 0; border-top: 1px solid var(--color-line); }
+  .facts p { margin: 0; }
+  .facts .num { font-size: clamp(30px, 5.4cqi, 64px); }
+  .faq__head, .ticket { position: static; }
+  .head { grid-template-columns: minmax(0, 1fr); }
+  .cant__head { grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-2) var(--space-3); }
+  .cant__head h2 { grid-column: 1 / -1; }
+  .cant__head .lead { grid-row: 2; grid-column: 1; }
+  .cant__count { grid-row: 2; grid-column: 2; }
+}
+@media (max-width: 900px) {
+  .hero__bar { display: flex; flex-direction: column; align-items: stretch; gap: 14px; }
+  .hero__bar > div:first-child { order: 2; }
+  .hero__bar .lead { display: none; }
+  .hero__fact { display: none; }
+  .paint { justify-self: auto; display: flex; justify-content: space-between; align-items: center; text-align: left; }
+  .paint__label { margin: 0; }
+  .hero__bar .button--arrow { width: 100%; justify-content: space-between; }
+  .hero__shot { position: static; order: -1; justify-items: start; text-align: left; }
+  .hero__shot span { font-size: 15px; }
+  .swatch { width: 40px; height: 40px; padding: 4px; }
+}
+
+@media (max-width: 700px) { .calc .inner { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- телефон: машина сверху, текст снизу ---------- */
+@media (max-width: 900px) {
+  h2.display { font-stretch: 132%; font-size: clamp(24px, 6.6vw, 30px); }
+  .hero__title { top: calc(61px + clamp(24px, 4.5vh, 40px)); font-stretch: var(--font-stretch-display-phone); font-size: clamp(26px, 8.2vw, 44px); line-height: .92; }
+  .why, .models, .contact { align-items: flex-end; padding-top: 52svh; }
+  /* телефон: подложка снизу, под текстом; гаснет в нижнем поле секции — следующий блок начинается с машины без края */
+  .why::before, .models::before, .contact::before { background: linear-gradient(180deg, rgb(11 14 22 / 0) 30%, rgb(11 14 22 / 0.04) 33.5%, rgb(11 14 22 / 0.147) 37%, rgb(11 14 22 / 0.297) 40.5%, rgb(11 14 22 / 0.47) 44%, rgb(11 14 22 / 0.643) 47.5%, rgb(11 14 22 / 0.793) 51%, rgb(11 14 22 / 0.9) 54.5%, rgb(11 14 22 / 0.94) 58%);
+    -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 64px), transparent); mask-image: linear-gradient(180deg, #000 calc(100% - 64px), transparent); }
+  .why::after { height: 26vh; background: linear-gradient(180deg, rgb(11 14 22 / .9), rgb(11 14 22 / .861) 12.5%, rgb(11 14 22 / .76) 25%, rgb(11 14 22 / .616) 37.5%, rgb(11 14 22 / .45) 50%, rgb(11 14 22 / .284) 62.5%, rgb(11 14 22 / .14) 75%, rgb(11 14 22 / .039) 87.5%, rgb(11 14 22 / 0)); }
+  .models .inner { grid-template-columns: minmax(0, 1fr); }
+  .models__col { grid-column: 1; min-width: 0; }
+  /* модели — лента карточек под машиной: выбор и выезд новой машины видны на одном экране */
+  .models .lead { margin-bottom: var(--space-2); }
+  .mlist { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; border-top: 0; margin: 0 calc(-1 * var(--gutter)); padding: 0 var(--gutter) 4px; scroll-padding-inline: var(--gutter); }
+  .mlist::-webkit-scrollbar { display: none; }
+  .mlist li { flex: 0 0 auto; border: 0; scroll-snap-align: start; }
+  .mrow { width: 172px; min-height: 0; height: 100%; grid-template-columns: 12px minmax(0, 1fr); gap: 6px 10px; align-items: start; padding: 12px; border: 1px solid var(--color-line); border-radius: var(--radius); background: rgb(18 23 38 / .85); }
+  .mrow i { width: 12px; height: 12px; margin-top: 4px; }
+  .mrow b { font-size: 15px; }
+  .mrow small { display: block; font-size: 13px; line-height: 1.35; }
+  .mrow span:last-child { grid-column: 2; font-size: 14px; }
+  .mrow[aria-pressed="true"] { border-color: var(--color-accent); background: rgb(26 24 20 / .9); }
+  .facts > div { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .facts .num { font-size: clamp(28px, 11cqi, 52px); }
+  .js .route { height: 300vh; }
+  .route__head { grid-template-columns: 1fr; }
+  /* телефон: число дней и текущий этап — в одну строку, подписи под линией скрыты */
+  .route__day { justify-self: start; grid-template-columns: auto minmax(0, 1fr); column-gap: 16px; align-items: end; justify-items: start; text-align: left; }
+  .route__day-label { grid-column: 1 / -1; }
+  .route__day .num { margin: 2px 0 0; }
+  .route__now b { font-size: 17px; }
+  .route__now span:last-child { font-size: 14px; }
+  .route__via { display: none; }
+  .route__stops li { padding: 0; font-size: 0; }
+  .route__stops li b, .route__stops li span { display: none; }
+  .js .pay { height: 300vh; }
+  /* телефон: машина — полосой сверху под шапкой, ниже заголовок, «Оплачено» и стопка; рамки видоискателя нет */
+  .pay__stage { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; gap: var(--space-2); }
+  .pay__head, .pay__paid, .pay__stack, .pay__note { grid-column: 1; grid-row: auto; }
+  .pay__stack { align-self: start; }
+  .js .pay__stage { padding-top: calc(var(--header-offset) + 23svh); align-content: start; }
+  .pay__view { display: none; }
+  .pay__paid { justify-self: stretch; width: 100%; text-align: left; }
+  .pay__paid .num { margin: 2px 0 10px; font-size: clamp(26px, 7.6vw, 40px); font-stretch: 125%; }
+  .js .pay__head .lead { display: none; }
+  .js .pay__head h2 { margin-bottom: 0; }
+  .js .pay__stack { padding-top: 36px; }
+  .pay__card { gap: var(--space-2); padding: 20px; }
+  .pay__card .num { margin: 4px 0 6px; font-size: clamp(28px, 8.4cqi, 44px); font-stretch: 125%; }
+  .pay__what { font-size: 15px; }
+  .pay__proof { gap: 10px; }
+  .pay__proof li { font-size: 15px; }
+  .pay__note { display: none; }
+  .cant__card { width: min(78vw, 360px); --card-h: min(46svh, 400px); }
+  .cant__card h3 { margin-top: var(--space-3); font-size: clamp(18px, 5vw, 22px); font-stretch: 115%; }
+  .cant__card p { font-size: 15px; }
+  .cant__num { font-size: 64px; }
+  .ticket { padding: 20px; }
+  .ticket__total .num { font-stretch: 150%; }
+  .contact .poster { position: static; width: 100%; }
+  /* заявка: форма длинная, и подложка «от 30% высоты» начиналась ниже заголовка — заголовок, абзац и поля лежали на
+     машине (правка 2026-10-06 по итогам проверки). Подложка — от начала текста (52svh), той же S-кривой */
+  .contact::before { background: linear-gradient(180deg, rgb(11 14 22 / 0) calc(52svh - 150px + 0px), rgb(11 14 22 / 0.04) calc(52svh - 150px + 25px), rgb(11 14 22 / 0.147) calc(52svh - 150px + 50px), rgb(11 14 22 / 0.297) calc(52svh - 150px + 75px), rgb(11 14 22 / 0.47) calc(52svh - 150px + 100px), rgb(11 14 22 / 0.643) calc(52svh - 150px + 125px), rgb(11 14 22 / 0.793) calc(52svh - 150px + 150px), rgb(11 14 22 / 0.9) calc(52svh - 150px + 175px), rgb(11 14 22 / 0.94) calc(52svh - 150px + 200px)); }
+}
+@media (max-width: 900px) and (max-height: 600px) { .js .route { height: auto; } .js .route__stage { position: relative; height: auto; } }
+/* телефон, закреплённая сцена: день пути и этап — под линией маршрута (правка 2026-10-06 по итогам проверки: заголовок,
+   счётчик и машина стояли в верхней половине экрана, ниже — пустой фон); --floor-y — высота линии, ставит showroom.js */
+@media (max-width: 900px) and (min-height: 601px) {
+  .js .route__day { position: absolute; left: 0; right: 0; top: calc(var(--floor-y, 70svh) - var(--space-stage-top) + 40px); }
+  .js .route__via { display: block; grid-column: 1 / -1; margin-top: 14px !important; }
+}
+/* низкие окна: абзацы оплаты и ленты прячем; на телефоне без места оплата не закрепляется — карточки списком */
+/* сноска «Суммы — пример…» на невысоком окне компьютера — тоже: стопка прижата к низу и иначе наезжает на абзац (правка 2026-10-07) */
+@media (min-width: 901px) and (max-height: 820px) { .js .pay__note { display: none; } }
+@media (max-height: 760px) { .js .pay__head .lead, .js .pay__note { display: none; } .js .pay__head h2 { margin-bottom: 0; } .cant.is-pinned .cant__head .lead { display: none; } }
+@media (max-width: 900px) and (max-height: 760px) { .js .pay__stage { padding-top: calc(var(--header-offset) + 15svh); } .js .pay__paid-of { display: none; } }
+/* короткий телефон: в карточке — этап, сумма и что уже есть до платежа; пояснение суммы прячем, чтобы карточка влезла */
+@media (max-width: 900px) and (max-height: 700px) { .js .pay__stage { padding-top: calc(var(--header-offset) + 12svh); } .js .pay__what, .js .pay__proof > p { display: none; } .js .pay__stack { padding-top: 28px; } }
+@media (max-width: 900px) and (max-height: 600px) {
+  .js .pay { height: auto; } .js .pay__stage { position: relative; height: auto; }
+  .js .pay__stack { gap: var(--space-2); padding-top: 0; } .js .pay__card { grid-area: auto; transform: none; } .js .pay__card::after { display: none; }
+}

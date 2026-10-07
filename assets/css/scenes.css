@@ -1,0 +1,163 @@
+/* Вторая подача (DESIGN.md → «Вторая подача», выбор владельца 2026-10-04): смена фона по блокам, плавная прокрутка
+   и новые блоки — «На скорости» и «Маршрут-карта» (с третьего пакета правок 2026-10-04 — сразу после расчёта), «Финал» (ниже заявки) («Появление» стало первым экраном, «Разворот» удалён — правки 2026-10-04).
+   3D-часть (окно холста, фон за машиной, монтаж, скорость, въезд) ведёт showroom.js по data-scene; текст и линию — scenes.js. */
+
+/* ---------- плавная прокрутка (Lenis, smooth.js): своя инерция вместо scroll-behavior ---------- */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* ---------- смена фона: «бумага» для калькулятора и вопросов ---------- */
+/* акцент на бумаге — тёмная шампань (5,9:1 к фону); кнопка — тёмная шампань со светлым текстом (6,8:1) */
+.on-paper { --color-bg: #ece8df; --color-surface: #f7f5f0; --color-text: #15161a; --color-muted: #5b5d66; --color-line: #d4cfc4;
+  --color-accent: #6f531d; --color-accent-hover: #84662a; --color-accent-text: #fff8ec; color: var(--color-text); }
+section.theme-paper { --color-bg: #ece8df; --color-surface: #f7f5f0; --color-text: #15161a; --color-muted: #5b5d66; --color-line: #d4cfc4;
+  --color-accent: #6f531d; --color-accent-hover: #84662a; --color-accent-text: #fff8ec; background: var(--color-bg); color: var(--color-text); }
+.theme-paper .ticket { box-shadow: 0 18px 40px rgb(40 32 18 / .08); }
+.theme-paper .ticket__total { border-top-color: #b9b3a6; }
+
+/* метки ракурсов внутри секции: точка на прокрутке для showroom.js (--end — последний экран секции) */
+.scene-key { position: absolute; left: 0; width: 1px; height: 0; pointer-events: none; }
+.scene-key--end { top: calc(100% - 100vh); }
+
+/* без WebGL новые блоки показывают свой рендер (.poster) */
+.speed .poster { position: absolute; z-index: 0; }
+
+/* ---------- 5. На скорости: фраза поверх машины в движении ---------- */
+.speed { position: relative; }
+.js .speed { height: 240vh; }
+.speed__stage { position: relative; display: flex; align-items: flex-end; min-height: 100vh; padding: var(--space-section) var(--gutter); overflow: hidden; }
+.js .speed__stage { position: sticky; top: 0; height: 100vh; min-height: 0; padding-top: 0; }
+.speed .poster { left: 50%; top: 40%; width: min(860px, 92vw); transform: translate(-50%, -50%); }
+.speed__text { position: relative; z-index: 1; max-width: 900px; }
+.speed__text h2 span { display: block; }
+/* заголовок — ровно в две строки (правка 2026-10-06, шестой пакет): колонка 900px переносила «ждут,» на отдельную строку.
+   Обе строки помещаются от 601px (самая длинная — ≈21,3 размера шрифта); на узком телефоне — переносы как были */
+@media (min-width: 601px) { .speed__text { max-width: none; } .speed__text h2 span { white-space: nowrap; } }
+.speed__text p { margin: 18px 0 0; max-width: 46ch; color: var(--color-muted); }
+
+/* ---------- 6. Маршрут-карта: «бумага» (theme-paper), линия через весь блок, документы разного размера ----------
+   Правка 2026-10-04, третий пакет: блок встал перед «45–60 дней» на графите — соседние блоки не повторяют фон (L8),
+   поэтому карта с документами — на бумаге */
+.map { position: relative; padding: var(--space-section) var(--gutter); }
+.map__head { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: var(--space-4); align-items: end; margin-bottom: calc(var(--space-6) + 24px); }
+/* «карта» под документами: сетка координат, гаснущая к краям (правка 2026-10-04, четвёртый пакет: «больше детализации») */
+.map__field { position: relative; }
+.map__field::before { content: ""; position: absolute; inset: -48px calc(-1 * var(--gutter)) -64px; pointer-events: none;
+  background: linear-gradient(rgb(21 22 26 / .055) 1px, transparent 1px) 0 0 / 100% 64px, linear-gradient(90deg, rgb(21 22 26 / .055) 1px, transparent 1px) 0 0 / 64px 100%;
+  -webkit-mask-image: radial-gradient(70% 60% at 50% 50%, #000 40%, transparent); mask-image: radial-gradient(70% 60% at 50% 50%, #000 40%, transparent); }
+.map__svg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.map__svg--live { will-change: transform; }   /* свой слой: линия и точка перерисовываются без пунктира, сетки и документов */
+/* маршрут: пунктир — весь путь, сплошная — пройденная часть, точка — где машина сейчас */
+.map__plan, .map__done { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.map__plan { stroke: rgb(21 22 26 / .3); stroke-width: 1.2; stroke-dasharray: 2 7; }
+.map__done { stroke: var(--color-accent); stroke-width: 2; }
+.map__head { fill: var(--color-accent); stroke: var(--color-bg); stroke-width: 3; }
+.map__stops { position: relative; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--space-3); row-gap: clamp(80px, 9vw, 150px); margin: 0; padding: 0; list-style: none; }
+.map__stop { grid-column: var(--col); }
+.map__node { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin: 0 0 16px; font-size: var(--text-small); }
+.map__node i { flex: none; width: 15px; height: 15px; border-radius: 50%; border: 1px solid rgb(21 22 26 / .5); background: var(--color-bg); transition: background-color .8s var(--ease), border-color .8s var(--ease), box-shadow .8s var(--ease); }
+.map__stop.is-on .map__node i { background: var(--color-accent); border-color: var(--color-accent); box-shadow: 0 0 0 6px rgb(111 83 29 / .14); }
+.map__city { font-weight: 600; }
+.map__geo { color: var(--color-muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+
+/* документ: шапка с номером и статусом, бумага с тенью, у каждого — свои детали */
+.doc { position: relative; padding: 0 24px 24px; background: var(--color-surface); border: 1px solid var(--color-line); border-radius: var(--radius);
+  background-image: linear-gradient(180deg, rgb(255 255 255 / .55), rgb(255 255 255 / 0) 120px);
+  transition: opacity .9s var(--ease), transform .9s var(--ease), border-color .9s var(--ease), box-shadow .9s var(--ease); }
+/* документ, до которого линия ещё не дошла, — бледнее, но сама карточка непрозрачная: прежде через полупрозрачную
+   карточку просвечивала линия маршрута (правка 2026-10-05) */
+.js .map__stop:not(.is-on) .doc { transform: translateY(18px); }
+.doc > * { transition: opacity .9s var(--ease); }
+.js .map__stop:not(.is-on) .doc > * { opacity: .4; }
+.map__stop.is-on .doc { border-color: #b9b3a6; box-shadow: 0 1px 0 rgb(255 255 255 / .8) inset, 0 18px 36px rgb(40 32 18 / .09), 0 2px 6px rgb(40 32 18 / .05); }
+.doc__top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 0 -24px 18px; padding: 11px 24px; border-bottom: 1px dashed var(--color-line); font-size: 12px; color: var(--color-muted); font-variant-numeric: tabular-nums; }
+.doc__no { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: .02em; }
+/* статус: «ожидается», пока линия не дошла до документа, потом — «готов» (без JS — сразу итог) */
+.doc__state { flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px 2px 7px; border: 1px solid currentColor; border-radius: 999px; font-size: 12px; color: var(--color-accent); transition: color .8s var(--ease); }
+.doc__state::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.doc__state::after { content: attr(data-done); }
+.js .map__stop:not(.is-on) .doc__state { color: var(--color-muted); }
+.js .map__stop:not(.is-on) .doc__state::after { content: attr(data-wait); }
+.doc__day { margin: 0 0 6px; font-size: 13px; color: var(--color-accent); font-variant-numeric: tabular-nums; }
+.doc h3 { margin: 0 0 14px; font-size: 21px; font-weight: 600; line-height: 1.2; }
+.doc p { margin: 0; color: var(--color-muted); font-size: 15px; }
+.doc .doc__small { margin-top: 12px; font-size: 13px; }
+.doc__rows { display: grid; margin: 0; font-size: 15px; }
+.doc__rows div { display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px dashed var(--color-line); }
+.doc__rows div:last-child { border-bottom: 0; }
+.doc__rows dt { color: var(--color-muted); }
+.doc__rows dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* фотоотчёт: крупный кадр и четыре маленьких — рендеры выбранной модели (materials/media/report) */
+.doc__shots { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; margin: 0 0 12px; }
+.doc__shot { position: relative; margin: 0; overflow: hidden; border-radius: 0; background: #10131c; aspect-ratio: 4 / 3; }
+.doc__shot--main { grid-column: 1 / 3; grid-row: 1 / 3; }
+.doc__shot img { display: block; width: 100%; height: 100%; object-fit: cover; transition: opacity .5s var(--ease); }
+.doc__shot img.is-swap { opacity: 0; }
+.doc__shot figcaption { position: absolute; left: 6px; bottom: 5px; font-size: 11px; line-height: 1.2; color: #eeebe4; text-shadow: 0 1px 6px rgb(0 0 0 / .7); }
+.doc__count { position: absolute; right: 6px; top: 6px; padding: 1px 6px; border-radius: var(--radius); font-size: 11px; color: #eeebe4; background: rgb(6 7 10 / .55); font-variant-numeric: tabular-nums; }
+.doc__more { position: absolute; inset: 0; display: grid; place-items: center; font-size: 15px; font-weight: 600; color: #fff; background: rgb(6 7 10 / .5); }
+.doc p.doc__vin { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; padding: 9px 12px; border: 1px solid var(--color-line); border-radius: var(--radius); background: rgb(255 255 255 / .5); font-size: 14px; }
+.doc__vin > span:first-child { font-size: 12px; color: var(--color-muted); }
+.doc__code { flex: 1; min-width: 0; color: var(--color-text); letter-spacing: .12em; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.doc__vin b { flex: none; font-weight: 600; font-size: 13px; color: var(--color-accent); }
+.doc__vin b::before { content: "✓ "; }
+
+/* ж/д-накладная: направление, отрывной корешок со штрихкодом и номером пломбы */
+.doc p.doc__leg { display: flex; align-items: center; gap: 10px; margin: 0 0 6px; font-size: 14px; color: var(--color-text); font-weight: 600; }
+.doc__leg i { position: relative; flex: 1; height: 1px; background: repeating-linear-gradient(90deg, var(--color-accent) 0 6px, transparent 6px 10px); }
+.doc__leg i::after { content: ""; position: absolute; right: -1px; top: -3px; border: 3.5px solid transparent; border-left: 6px solid var(--color-accent); border-right: 0; }
+.doc__stub { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 14px -24px -24px; padding: 14px 24px 16px; border-top: 1px dashed #b9b3a6; font-size: 12px; color: var(--color-muted); font-variant-numeric: tabular-nums; }
+.doc__stub::before, .doc__stub::after { content: ""; position: absolute; top: -8px; width: 16px; height: 16px; border-radius: 50%; background: var(--color-bg); border: 1px solid var(--color-line); }
+.doc__stub::before { left: -9px; clip-path: inset(0 0 0 50%); }
+.doc__stub::after { right: -9px; clip-path: inset(0 50% 0 0); }
+.doc__bars { flex: 1; max-width: 190px; height: 30px; opacity: .85;
+  background: repeating-linear-gradient(90deg, var(--color-text) 0 2px, transparent 2px 4px, var(--color-text) 4px 5px, transparent 5px 8px, var(--color-text) 8px 11px, transparent 11px 12px, var(--color-text) 12px 13px, transparent 13px 16px, var(--color-text) 16px 17px, transparent 17px 19px); }
+
+/* транзит: страны по порядку */
+.doc__legs { display: flex; flex-wrap: wrap; gap: 6px 0; margin: 0 0 12px; padding: 0; list-style: none; font-size: 13px; }
+.doc__legs li { display: flex; align-items: center; color: var(--color-text); }
+.doc__legs li + li::before { content: ""; width: 14px; height: 1px; margin: 0 6px; background: var(--color-accent); }
+
+/* декларация: печать «выпуск разрешён» опускается на документ, когда линия до него дошла */
+.doc--customs { overflow: hidden; }
+.doc__seal { position: absolute; right: 20px; bottom: 12px; width: 100px; height: 100px; fill: none; stroke: var(--color-accent); stroke-width: 2; color: var(--color-accent); opacity: .78; transform: rotate(-14deg); transition: opacity .9s var(--ease), transform .9s var(--ease); pointer-events: none; }
+.doc__seal circle:nth-of-type(2) { stroke-width: 1; }
+.doc__seal text { fill: currentColor; stroke: none; font-family: var(--font-heading); font-stretch: 130%; font-weight: 700; font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; }
+.doc__seal .doc__seal-mid { font-size: 17px; text-anchor: middle; letter-spacing: .02em; }
+.js .map__stop:not(.is-on) .doc__seal { opacity: 0; transform: rotate(-4deg) scale(1.5); }
+.doc--customs .doc__small { min-height: 84px; padding-right: 120px; }   /* пустое место внизу — под печать */
+
+/* ЭПТС: QR-код, статус, ключи */
+.doc__pass { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 18px; align-items: center; margin: 0 0 12px; }
+.doc__qr { width: 84px; height: 84px; padding: 6px; border: 1px solid var(--color-line); border-radius: var(--radius); background: #fff; fill: var(--color-text); }
+.doc__key { width: 18px; height: 18px; vertical-align: -4px; fill: none; stroke: var(--color-accent); stroke-width: 1.8; stroke-linecap: round; }
+
+/* узкая карточка (правка 2026-10-07, адаптивы 980 и 901: значения ЭПТС уходили за правый край, номер в шапке обрезался
+   многоточием) — раскладка по ширине самой карточки: шапка переносится, у ЭПТС значение встаёт под подписью, QR меньше */
+.doc { container-type: inline-size; }
+@container (max-width: 380px) {
+  .doc__top { flex-wrap: wrap; row-gap: 6px; }
+  .doc__no { white-space: normal; overflow: visible; }
+  .doc__pass { grid-template-columns: 64px minmax(0, 1fr); gap: 16px; align-items: start; }
+  .doc__qr { width: 64px; height: 64px; padding: 5px; }
+  .doc__pass .doc__rows div { display: grid; gap: 2px; padding: 7px 0; }
+  .doc__pass .doc__rows dd { text-align: left; }
+}
+
+/* ---------- телефон и планшет ---------- */
+@media (max-width: 900px) {
+  .js .speed { height: 200vh; }
+  .speed__text h2 { font-size: clamp(24px, 6.6vw, 30px); }
+
+  .map__head { grid-template-columns: minmax(0, 1fr); margin-bottom: var(--space-5); }
+  .map__stops { grid-template-columns: minmax(0, 1fr); row-gap: 56px; }
+  .map__stop { grid-column: 1; }
+  .map__node { margin-left: -1px; }
+  .doc { margin-left: 28px; padding: 0 18px 18px; }
+  .doc__top { margin: 0 -18px 16px; padding: 10px 18px; }
+  .doc__stub { margin: 14px -18px -18px; padding: 12px 18px 14px; }
+  .doc__seal { right: 12px; bottom: 10px; width: 84px; height: 84px; }
+  .doc--customs .doc__small { min-height: 72px; padding-right: 96px; }
+}

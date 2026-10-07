@@ -1,0 +1,56 @@
+/* Значения из DESIGN.md (направление «Ночной шоурум», выбрано 2026-10-03). */
+
+/* Шрифты — только локальные файлы, лицензии OFL рядом в site/assets/fonts. */
+@font-face { font-family: "Science Gothic"; src: url("../fonts/sciencegothic-cyrillic.woff2") format("woff2"); font-weight: 100 900; font-stretch: 50% 200%; font-display: swap;
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+@font-face { font-family: "Science Gothic"; src: url("../fonts/sciencegothic-latin.woff2") format("woff2"); font-weight: 100 900; font-stretch: 50% 200%; font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Golos Text"; src: url("../fonts/golostext-cyrillic.woff2") format("woff2"); font-weight: 400 900; font-display: swap;
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+@font-face { font-family: "Golos Text"; src: url("../fonts/golostext-latin.woff2") format("woff2"); font-weight: 400 900; font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+:root {
+  --color-bg: #0b0e16;             /* ночь — фон страницы и зала: синеватая, как край фона первого экрана (правка 2026-10-05: «фоны с синим оттенком, как в херо») */
+  --color-surface: #121726;        /* чек-расчёт, карточки, поля формы — тоже с синим оттенком */
+  --color-text: #eeebe4;           /* тёплый белый */
+  --color-muted: #8d8f97;          /* пояснения, подписи */
+  --color-accent: #d6b273;         /* шампань — кнопки, цифры, активные состояния */
+  --color-accent-hover: #e6c78f;   /* наведение на кнопку — светлее акцента (тёмная тема) */
+  --color-accent-text: #14110b;
+  --color-line: #252c3d;
+
+  /* 3D-сцена */
+  --paint-default: #6e0b10;        /* Кармин */
+  --light-key: #fff4e6;
+  --light-rim: #8fb0ff;
+
+  --font-heading: "Science Gothic", "Arial Black", sans-serif;
+  --font-body: "Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-stretch-display: 190%;
+  --font-stretch-display-phone: 165%;
+
+  --text-base: 17px;
+  --text-small: 14px;
+  --text-h1: clamp(34px, min(5.3vw, 9.5vh), 104px);   /* на низких окнах заголовок меньше — машине остаётся место */
+  --text-h2: clamp(26px, 3.4vw, 60px);
+  --text-num: clamp(22px, 2.2vw, 36px);
+
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 40px;
+  --space-5: 64px;
+  --space-6: 104px;
+  --space-section: clamp(72px, 8vw, 144px); /* отступ сверху и снизу — один для всех секций */
+  --space-stage-top: max(var(--space-section), calc(var(--header-offset) + 8px)); /* верх закреплённых блоков — тот же отступ, что у остальных секций, но не под шапкой (правка 2026-10-05: «отступы между блоками разные») */
+  --header-offset: 88px;                     /* высота закреплённой шапки + зазор: якоря и липкие колонки */
+  --container: none;                         /* во всю ширину с полями --gutter: шапка, подвал и блоки с тем же левым краем, что первый экран (правка 2026-10-04, четвёртый пакет: «много силовых линий») */
+  --gutter: clamp(16px, 2.2vw, 32px);
+  --radius: 2px;
+  --control-height: 56px;
+  --control-height-small: 44px;
+  --transition: 200ms;
+  --transition-soft: 350ms;                  /* наведение, смена цвета — без рывка */
+  --ease: cubic-bezier(.22, 1, .36, 1);
+}
