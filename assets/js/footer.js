@@ -1,5 +1,5 @@
 // Общий подвал из config.js: название и описание, кнопка главного действия, разделы, контакты, юридические ссылки;
-// внизу — только копирайт (правка 2026-10-05: пометка концепта и авторство материалов убраны по решению владельца). Одинаковый на всех страницах (главная, юридические, 404).
+// внизу — копирайт и мелким шрифтом авторы 3D-моделей и фото (config.js → credits; правка 2026-10-07 — вернули по решению владельца). Одинаковый на всех страницах (главная, юридические, 404).
 (function () {
   var mount = document.querySelector('[data-include="footer"]');
   if (!mount || !window.SITE) return;
@@ -46,5 +46,22 @@
   var bottom = el('div', 'site-footer__bottom');
   bottom.append(el('p', null, '© ' + new Date().getFullYear() + ' ' + (site.name || '')));
   footer.append(bottom);
+  // авторы материалов — мелким шрифтом в самом конце (правка 2026-10-07): «Работа — автор (лицензия)» через точку с запятой
+  var safe = function (u) { return /^https:\/\//.test(u || '') ? u : ''; };
+  if ((site.credits || []).length) {
+    var credits = el('div', 'site-footer__credits');
+    site.credits.forEach(function (g) {
+      var p = el('p');
+      if (g.label) p.append(g.label + ' ');
+      (g.items || []).forEach(function (it, i) {
+        if (i) p.append('; ');
+        p.append(safe(it.href) ? link(it.text, safe(it.href)) : it.text);
+        if (it.license) { p.append(' ('); p.append(safe(it.licenseHref) ? link(it.license, safe(it.licenseHref)) : it.license); p.append(')'); }
+      });
+      p.append('.');
+      credits.append(p);
+    });
+    footer.append(credits);
+  }
   mount.replaceChildren(footer);
 })();
